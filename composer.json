@@ -4,6 +4,11 @@
     "license": "MIT",
     "type": "library",
     "homepage": "https://github.com/php-object-mapper",
+    "keywords": [
+        "Object",
+        "XML",
+        "Mapper"
+    ],
     "authors": [
         {
             "name": "Randy Schütt",

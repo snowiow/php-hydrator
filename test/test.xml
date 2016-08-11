@@ -11,6 +11,7 @@
                     <StatusID>OK</StatusID>
                     <Gueltigkeitsende xsi:nil="true" />
                     <Schwebe>false</Schwebe>
+                    <Test />
                     <Meldung>
                         <ArtID>Hinweis</ArtID>
                         <MeldungID>04000</MeldungID>

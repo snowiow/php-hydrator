@@ -35,7 +35,7 @@ final class ObjectHydrate
         $assignment = new AttributeAssignment($this->ref);
         foreach ($attributes as $attr => $value) {
             $attr = preg_replace('#\s+#', '_', $attr);
-            $attr = preg_replace_callback('#(_[a-z])+#i', function(array $matches) {
+            $attr = preg_replace_callback('#(_[a-z])#i', function(array $matches) {
                 return ucfirst($matches[0][1]);
             }, $attr);
 

@@ -10,7 +10,11 @@ use ReflectionClass;
  */
 final class AttributeAssignment
 {
-    const SETTERS_PREFIXES = ['set', 'append'];
+    const SETTERS_PREFIXES = [
+        'set',
+        'add',
+        'append'
+    ];
 
     /**
      * @var null|ReflectionClass

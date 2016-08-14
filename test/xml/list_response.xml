@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:allg="http://www.bipro.net/namespace/allgemein"
+                  xmlns:transfer="http://www.bipro.net/namespace/transfer">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <ns5:listShipmentsResponse xmlns:ns5="http://www.bipro.net/namespace/transfer"
+                                   xmlns="http://www.bipro.net/namespace/allgemein"
+                                   xmlns:ns6="http://www.bipro.net/namespace/transfer-inkassostoerfall"
+                                   xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                                   xmlns:ns2="http://www.bipro.net/namespace/transfer-gevo"
+                                   xmlns:ns3="http://www.bipro.net/namespace/partner">
+            <ns5:Response>
+                <BiPROVersion>2.1.1.1.0</BiPROVersion>
+                <Status>
+                    <ProzessID>1015055343</ProzessID>
+                    <Zeitstempel>2016-08-08T13:00:02</Zeitstempel>
+                    <StatusID>OK</StatusID>
+                    <Schwebe>false</Schwebe>
+                    <Meldung>
+                        <ArtID>Hinweis</ArtID>
+                        <MeldungID>04000</MeldungID>
+                        <Text>Transferprozess erfolgreich</Text>
+                    </Meldung>
+                </Status>
+                <ns5:Lieferung>
+                    <ns5:ID>13800302</ns5:ID>
+                    <ns5:VUNummer>5374</ns5:VUNummer>
+                    <ns5:Einstellzeitpunkt>2016-02-15T15:14:02</ns5:Einstellzeitpunkt>
+                    <ns5:Bestaetigungszeitpunkt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:nil="true"></ns5:Bestaetigungszeitpunkt>
+                    <ns5:Kategorie>150000000</ns5:Kategorie>
+                    <ns5:VerfuegbarBis>2016-08-13</ns5:VerfuegbarBis>
+                    <ns5:VUNummernart>BaFin</ns5:VUNummernart>
+                </ns5:Lieferung>
+                <ns5:Lieferung>
+                    <ns5:ID>13800304</ns5:ID>
+                    <ns5:VUNummer>5374</ns5:VUNummer>
+                    <ns5:Einstellzeitpunkt>2016-02-15T15:14:02</ns5:Einstellzeitpunkt>
+                    <ns5:Bestaetigungszeitpunkt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:nil="true"></ns5:Bestaetigungszeitpunkt>
+                    <ns5:Kategorie>140013000</ns5:Kategorie>
+                    <ns5:VerfuegbarBis>2016-08-11</ns5:VerfuegbarBis>
+                    <ns5:VUNummernart>BaFin</ns5:VUNummernart>
+                </ns5:Lieferung>
+                <ns5:Lieferung>
+                    <ns5:ID>13800306</ns5:ID>
+                    <ns5:VUNummer>5374</ns5:VUNummer>
+                    <ns5:Einstellzeitpunkt>2016-02-15T15:14:02</ns5:Einstellzeitpunkt>
+                    <ns5:Bestaetigungszeitpunkt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:nil="true"></ns5:Bestaetigungszeitpunkt>
+                    <ns5:Kategorie>140013000</ns5:Kategorie>
+                    <ns5:VerfuegbarBis>2016-08-11</ns5:VerfuegbarBis>
+                    <ns5:VUNummernart>BaFin</ns5:VUNummernart>
+                </ns5:Lieferung>
+                <ns5:Lieferung>
+                    <ns5:ID>13800308</ns5:ID>
+                    <ns5:VUNummer>5374</ns5:VUNummer>
+                    <ns5:Einstellzeitpunkt>2016-02-15T15:14:02</ns5:Einstellzeitpunkt>
+                    <ns5:Bestaetigungszeitpunkt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xsi:nil="true"></ns5:Bestaetigungszeitpunkt>
+                    <ns5:Kategorie>140013000</ns5:Kategorie>
+                    <ns5:VerfuegbarBis>2016-08-13</ns5:VerfuegbarBis>
+                    <ns5:VUNummernart>BaFin</ns5:VUNummernart>
+                </ns5:Lieferung>
+            </ns5:Response>
+        </ns5:listShipmentsResponse>
+    </soapenv:Body>
+</soapenv:Envelope>

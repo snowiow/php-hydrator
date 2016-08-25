@@ -24,7 +24,8 @@
     },
     "autoload": {
         "classmap": [
-            "src/"
+            "src/",
+            "test/"
         ],
         "psr-4": {
             "Dgame\\ObjectMapper\\": "src/"

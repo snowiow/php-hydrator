@@ -89,7 +89,8 @@ final class AttributeAssignment
                     $value  = $mapper->hydrate($value);
                 }
 
-                $this->object->{$method}($value);
+//                $this->object->{$method}($value);
+                call_user_func([$this->object, $method], $value);
 
                 return true;
             }

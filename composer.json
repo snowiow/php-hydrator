@@ -1,9 +1,9 @@
 {
-    "name": "dgame/php-object-mapper",
-    "description": "php object mapper",
+    "name": "dgame/php-hydrator",
+    "description": "php hydrator",
     "license": "MIT",
     "type": "library",
-    "homepage": "https://github.com/php-object-mapper",
+    "homepage": "https://github.com/php-hydrator",
     "keywords": [
         "Object",
         "XML",
@@ -28,7 +28,7 @@
             "test/"
         ],
         "psr-4": {
-            "Dgame\\ObjectMapper\\": "src/"
+            "Dgame\\Hydrator\\": "src/"
         }
     }
 }

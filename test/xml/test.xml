@@ -12,10 +12,10 @@
         <Transfer>
             <Erstelldatum>11.11.1911</Erstelldatum>
             <Datei>
-                <Dateiname>abc.pdf</Dateiname>
+                <q:Dateiname>abc.pdf</q:Dateiname>
             </Datei>
             <Datei>
-                <Dateiname>def.zip</Dateiname>
+                <q:Dateiname>def.zip</q:Dateiname>
             </Datei>
         </Transfer>
         <Transfer>

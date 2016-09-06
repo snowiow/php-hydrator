@@ -26,26 +26,36 @@ final class Resolver implements Aliasable
      *
      * @return Alias
      */
-    public function use (string $class) : Alias
+    public function use (string $class): Alias
     {
         return new Alias($class, $this);
     }
 
     /**
-     * @param string $class
+     * @param string $name
      *
      * @return string
      */
-    public function resolve(string $class): string
+    public function normalize(string $name): string
     {
-        if (array_key_exists($class, $this->aliase)) {
-            return $this->aliase[$class];
+        if (preg_match('#([a-z]+)$#iS', $name, $matches)) {
+            $name = trim($matches[1]);
         }
 
-        if (strpos($class, ':') !== false) {
-            $class = substr(strrchr($class, ':'), 1);
+        return $name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function resolve(string $name): string
+    {
+        if (array_key_exists($name, $this->aliase)) {
+            return $this->aliase[$name];
         }
 
-        return $class;
+        return $this->normalize($name);
     }
 }

@@ -99,7 +99,8 @@ final class XmlHydrator
     private function hydrateTextNode(DOMText $text)
     {
         if (!empty($this->property) && !empty($this->hydrations)) {
-            end($this->hydrations)->assign($this->property, trim($text->nodeValue));
+            $property = $this->resolver->normalize($this->property);
+            end($this->hydrations)->assign($property, trim($text->nodeValue));
         }
     }
 
@@ -108,7 +109,9 @@ final class XmlHydrator
      */
     private function invoke(string $class)
     {
-        $hydration = new Hydration($this->resolver->resolve($class));
+        $class     = $this->resolver->resolve($class);
+        $hydration = new Hydration($class);
+
         $this->assign($hydration);
         $this->hydrations[] = $hydration;
     }

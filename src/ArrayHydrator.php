@@ -60,6 +60,7 @@ final class ArrayHydrator
         if (class_exists($attribute)) {
             $this->invoke($attribute);
         } else if ($this->hydration !== null) {
+            $attribute = $this->resolver->normalize($attribute);
             $this->hydration->assign($attribute, $value);
         }
 
@@ -73,10 +74,14 @@ final class ArrayHydrator
      */
     private function invoke(string $class)
     {
-        $hydration = new Hydration($this->resolver->resolve($class));
+        $class     = $this->resolver->resolve($class);
+        $hydration = new Hydration($class);
+
         if ($this->hydration !== null) {
-            $this->hydration->assign($hydration->getReflection()->getShortName(), $hydration->getObject());
+            $class = $hydration->getReflection()->getShortName();
+            $this->hydration->assign($class, $hydration->getObject());
         }
+
         $this->objects[] = $hydration->getObject();
         $this->hydration = $hydration;
     }

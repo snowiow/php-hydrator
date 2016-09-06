@@ -1,0 +1,25 @@
+<root>
+    <Status>
+        <ProzessID>753</ProzessID>
+        <Meldung>
+            <Text>Awesome</Text>
+        </Meldung>
+    </Status>
+    <Lieferung>
+        <ID>1337</ID>
+        <VUNummer>123</VUNummer>
+        <Kategorie>Test</Kategorie>
+        <Transfer>
+            <Erstelldatum>11.11.1911</Erstelldatum>
+            <Datei>
+                <Dateiname>abc.pdf</Dateiname>
+            </Datei>
+            <Datei>
+                <Dateiname>def.zip</Dateiname>
+            </Datei>
+        </Transfer>
+        <Transfer>
+            <Erstelldatum>14.04.1921</Erstelldatum>
+        </Transfer>
+    </Lieferung>
+</root>

@@ -2,8 +2,8 @@
 
 class Transfer
 {
-    private $Erstelldatum = null;
-    private $files        = [];
+    private $Erstelldatum;
+    private $files = [];
 
     public function setErstelldatum(string $Erstelldatum)
     {
@@ -13,5 +13,15 @@ class Transfer
     public function appendDatei(Datei $datei)
     {
         $this->files[] = $datei;
+    }
+
+    public function getErstelldatum(): string
+    {
+        return $this->Erstelldatum;
+    }
+
+    public function getFiles(): array
+    {
+        return $this->files;
     }
 }

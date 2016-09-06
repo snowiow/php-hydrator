@@ -7,13 +7,13 @@ use Dgame\Hydrator\XmlHydrator;
 require_once 'vendor/autoload.php';
 
 $doc = new DOMDocument('1.0', 'utf-8');
-$doc->load('test/xml/get_response.xml');
+$doc->load('test/xml/test.xml');
 
 $resolver = new Resolver();
 
 print '<pre>';
 $hydrator = new XmlHydrator($doc, $resolver);
-print_r($hydrator);
+print_r($hydrator->getHydratedObjects());
 
 $data = [
     'Lieferung' => [
@@ -25,4 +25,4 @@ $data = [
 ];
 
 $hydrator = new ArrayHydrator($data, $resolver);
-print_r($hydrator);
+print_r($hydrator->getHydratedObjects());

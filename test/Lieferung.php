@@ -2,10 +2,10 @@
 
 class Lieferung
 {
-    private $id       = null;
-    private $VUNummer = null;
-    private $category = null;
-    private $transfer = null;
+    private $id;
+    private $VUNummer;
+    private $category;
+    private $transfers = [];
 
     public function setID(string $id)
     {
@@ -22,8 +22,28 @@ class Lieferung
         $this->category = $category;
     }
 
-    public function setTransfer(Transfer $transfer)
+    public function appendTransfer(Transfer $transfer)
     {
-        $this->transfer = $transfer;
+        $this->transfers[] = $transfer;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getVUNummer()
+    {
+        return $this->VUNummer;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function getTransfers(): array
+    {
+        return $this->transfers;
     }
 }

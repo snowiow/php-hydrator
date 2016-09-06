@@ -19,17 +19,13 @@ final class XmlHydrator
      */
     private $resolver;
     /**
-     * @var object[]
-     */
-    private $objects = [];
-    /**
      * @var string
      */
     private $property;
     /**
-     * @var Hydration
+     * @var Hydration[]
      */
-    private $hydration;
+    private $hydrations = [];
 
     /**
      * XmlHydrator constructor.
@@ -46,9 +42,14 @@ final class XmlHydrator
     /**
      * @return object[]
      */
-    public function getObjects(): array
+    public function getHydratedObjects(): array
     {
-        return $this->objects;
+        $objects = [];
+        foreach ($this->hydrations as $hydration) {
+            $objects[] = $hydration->getObject();
+        }
+
+        return $objects;
     }
 
     /**
@@ -97,8 +98,8 @@ final class XmlHydrator
      */
     private function hydrateTextNode(DOMText $text)
     {
-        if (!empty($this->property) && $this->hydration !== null) {
-            $this->hydration->assign($this->property, trim($text->nodeValue));
+        if (!empty($this->property) && !empty($this->hydrations)) {
+            end($this->hydrations)->assign($this->property, trim($text->nodeValue));
         }
     }
 
@@ -108,10 +109,20 @@ final class XmlHydrator
     private function invoke(string $class)
     {
         $hydration = new Hydration($this->resolver->resolve($class));
-        if ($this->hydration !== null) {
-            $this->hydration->assign($hydration->getReflection()->getShortName(), $hydration->getObject());
+        $this->assign($hydration);
+        $this->hydrations[] = $hydration;
+    }
+
+    /**
+     * @param Hydration $hydration
+     */
+    private function assign(Hydration $hydration)
+    {
+        for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
+            $property = $hydration->getReflection()->getShortName();
+            if ($this->hydrations[$i]->assign($property, $hydration->getObject())) {
+                break;
+            }
         }
-        $this->objects[] = $hydration->getObject();
-        $this->hydration = $hydration;
     }
 }

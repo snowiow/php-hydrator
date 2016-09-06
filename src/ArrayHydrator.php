@@ -36,7 +36,7 @@ final class ArrayHydrator
     /**
      * @return object[]
      */
-    public function getObjects(): array
+    public function getHydratedObjects(): array
     {
         return $this->objects;
     }

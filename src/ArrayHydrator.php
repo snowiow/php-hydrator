@@ -46,20 +46,16 @@ final class ArrayHydrator
     public function hydrate(array $data)
     {
         foreach ($data as $key => $value) {
-            if (!is_string($key)) {
-                if (is_array($value)) {
-                    $this->hydrate($value);
+            if (is_string($key)) {
+                if (class_exists($key) && is_array($value)) {
+                    $value = $this->hydrateClass($key, $value);
                 }
 
-                continue;
-            }
-
-            if (class_exists($key) && is_array($value)) {
-                $value = $this->hydrateClass($key, $value);
-            }
-
-            if (!empty($this->hydrations)) {
-                end($this->hydrations)->assign($key, $value);
+                if (!empty($this->hydrations)) {
+                    end($this->hydrations)->assign($key, $value);
+                }
+            } else if (is_array($value)) {
+                $this->hydrate($value);
             }
         }
     }

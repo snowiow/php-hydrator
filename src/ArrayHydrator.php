@@ -13,13 +13,9 @@ final class ArrayHydrator
      */
     private $resolver;
     /**
-     * @var object[]
+     * @var Hydration[]
      */
-    private $objects = [];
-    /**
-     * @var Hydration
-     */
-    private $hydration;
+    private $hydrations;
 
     /**
      * ArrayHydrator constructor.
@@ -38,7 +34,12 @@ final class ArrayHydrator
      */
     public function getHydratedObjects(): array
     {
-        return $this->objects;
+        $objects = [];
+        foreach ($this->hydrations as $hydration) {
+            $objects[] = $hydration->getObject();
+        }
+
+        return $objects;
     }
 
     /**
@@ -59,9 +60,9 @@ final class ArrayHydrator
     {
         if (class_exists($attribute)) {
             $this->invoke($attribute);
-        } else if ($this->hydration !== null) {
+        } else if (!empty($this->hydrations)) {
             $attribute = $this->resolver->normalize($attribute);
-            $this->hydration->assign($attribute, $value);
+            end($this->hydrations)->assign($attribute, $value);
         }
 
         if (is_array($value)) {
@@ -77,12 +78,20 @@ final class ArrayHydrator
         $class     = $this->resolver->resolve($class);
         $hydration = new Hydration($class);
 
-        if ($this->hydration !== null) {
-            $class = $hydration->getReflection()->getShortName();
-            $this->hydration->assign($class, $hydration->getObject());
-        }
+        $this->assign($hydration);
+        $this->hydrations[] = $hydration;
+    }
 
-        $this->objects[] = $hydration->getObject();
-        $this->hydration = $hydration;
+    /**
+     * @param Hydration $hydration
+     */
+    private function assign(Hydration $hydration)
+    {
+        for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
+            $property = $hydration->getReflection()->getShortName();
+            if ($this->hydrations[$i]->assign($property, $hydration->getObject())) {
+                break;
+            }
+        }
     }
 }

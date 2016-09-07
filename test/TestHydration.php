@@ -55,10 +55,15 @@ class TestHydration extends TestCase
     {
         $data = [
             'Lieferung' => [
-                'id'       => 123,
-                'Transfer' => [
-                    'Erstelldatum' => '15.07.1987'
-                ]
+                'id' => 123,
+                [
+                    'Transfer' => [
+                        'Erstelldatum' => '11.11.1911',
+                        ['Datei' => ['Dateiname' => 'abc.pdf']],
+                        ['Datei' => ['Dateiname' => 'def.zip']]
+                    ],
+                ],
+                ['Transfer' => ['Erstelldatum' => '14.04.1921']]
             ]
         ];
 
@@ -70,8 +75,19 @@ class TestHydration extends TestCase
         $this->assertInstanceOf(Transfer::class, $objects[1]);
 
         $this->assertEquals(123, $objects[0]->getId());
-        $this->assertCount(1, $objects[0]->getTransfers());
-        $this->assertInstanceOf(Transfer::class, $objects[0]->getTransfers()[0]);
-        $this->assertEquals('15.07.1987', $objects[0]->getTransfers()[0]->getErstelldatum());
+        $this->assertCount(2, $objects[0]->getTransfers());
+        foreach ($objects[0]->getTransfers() as $transfer) {
+            $this->assertInstanceOf(Transfer::class, $transfer);
+        }
+
+        $this->assertCount(2, $objects[0]->getTransfers()[0]->getFiles());
+        foreach ($objects[0]->getTransfers()[0]->getFiles() as $file) {
+            $this->assertInstanceOf(Datei::class, $file);
+        }
+
+        $this->assertEquals('11.11.1911', $objects[1]->getErstelldatum());
+        $this->assertEquals('14.04.1921', $objects[4]->getErstelldatum());
+        $this->assertEquals('abc.pdf', $objects[2]->Dateiname);
+        $this->assertEquals('def.zip', $objects[3]->Dateiname);
     }
 }

@@ -11,10 +11,10 @@
         <Kategorie>Test</Kategorie>
         <Transfer>
             <Erstelldatum>11.11.1911</Erstelldatum>
-            <Datei>
+            <Datei xmlns:q="foo">
                 <q:Dateiname>abc.pdf</q:Dateiname>
             </Datei>
-            <Datei>
+            <Datei xmlns:q="bar">
                 <q:Dateiname>def.zip</q:Dateiname>
             </Datei>
         </Transfer>

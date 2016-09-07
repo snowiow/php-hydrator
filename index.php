@@ -17,10 +17,15 @@ print_r($hydrator->getHydratedObjects());
 
 $data = [
     'Lieferung' => [
-        'id'       => 123,
-        'Transfer' => [
-            'Erstelldatum' => '15.07.1987'
-        ]
+        'id' => 123,
+        [
+            'Transfer' => [
+                'Erstelldatum' => '11.11.1911',
+                ['Datei' => ['Dateiname' => 'abc.pdf']],
+                ['Datei' => ['Dateiname' => 'def.zip']]
+            ],
+        ],
+        ['Transfer' => ['Erstelldatum' => '14.04.1921']]
     ]
 ];
 

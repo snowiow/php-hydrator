@@ -15,8 +15,10 @@ class TestHydration extends TestCase
         $doc->load('xml/test.xml');
 
         $resolver = new Resolver();
-        $hydrator = new XmlHydrator($doc, $resolver);
-        $objects  = $hydrator->getHydratedObjects();
+        $hydrator = new XmlHydrator($resolver);
+
+        $hydrator->hydrate($doc);
+        $objects = $hydrator->getHydratedObjects();
 
         $this->assertInstanceOf(Status::class, $objects[0]);
         $this->assertInstanceOf(Meldung::class, $objects[1]);
@@ -68,8 +70,10 @@ class TestHydration extends TestCase
         ];
 
         $resolver = new Resolver();
-        $hydrator = new ArrayHydrator($data, $resolver);
-        $objects  = $hydrator->getHydratedObjects();
+        $hydrator = new ArrayHydrator($resolver);
+
+        $hydrator->hydrate($data);
+        $objects = $hydrator->getHydratedObjects();
 
         $this->assertInstanceOf(Lieferung::class, $objects[0]);
         $this->assertInstanceOf(Transfer::class, $objects[1]);

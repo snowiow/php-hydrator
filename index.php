@@ -12,7 +12,8 @@ $doc->load('test/xml/test.xml');
 $resolver = new Resolver();
 
 print '<pre>';
-$hydrator = new XmlHydrator($doc, $resolver);
+$hydrator = new XmlHydrator($resolver);
+$hydrator->hydrate($doc);
 print_r($hydrator->getHydratedObjects());
 
 $data = [
@@ -29,5 +30,6 @@ $data = [
     ]
 ];
 
-$hydrator = new ArrayHydrator($data, $resolver);
+$hydrator = new ArrayHydrator($resolver);
+$hydrator->hydrate($data);
 print_r($hydrator->getHydratedObjects());

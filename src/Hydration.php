@@ -3,6 +3,8 @@
 namespace Dgame\Hydrator;
 
 use ReflectionClass;
+use ReflectionException;
+use TypeError;
 
 /**
  * Class Hydration
@@ -91,8 +93,17 @@ final class Hydration
         $property = ucfirst($property);
         foreach (self::PREFIXES as $prefix) {
             $method = $prefix . $property;
-            if ($this->reflection->hasMethod($method) && $this->reflection->getMethod($method)->isPublic()) {
-                $this->reflection->getMethod($method)->invoke($this->object, $value);
+            if ($this->reflection->hasMethod($method)) {
+                $method = $this->reflection->getMethod($method);
+                if (!$method->isPublic()) {
+                    return false;
+                }
+
+                try {
+                    $method->invoke($this->object, $value);
+                } catch (TypeError $t) {
+                    return false;
+                }
 
                 return true;
             }

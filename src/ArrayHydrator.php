@@ -20,13 +20,11 @@ final class ArrayHydrator
     /**
      * ArrayHydrator constructor.
      *
-     * @param array    $attributes
      * @param Resolver $resolver
      */
-    public function __construct(array $attributes, Resolver $resolver)
+    public function __construct(Resolver $resolver)
     {
         $this->resolver = $resolver;
-        $this->traverse($attributes);
     }
 
     /**
@@ -43,43 +41,79 @@ final class ArrayHydrator
     }
 
     /**
-     * @param array $attributes
+     * @param array $data
      */
-    private function traverse(array $attributes)
+    public function hydrate(array $data)
     {
-        foreach ($attributes as $attribute => $value) {
-            $this->hydrate($attribute, $value);
-        }
-    }
+        foreach ($data as $key => $value) {
+            if (!is_string($key)) {
+                if (is_array($value)) {
+                    $this->hydrate($value);
+                }
 
-    /**
-     * @param string $attribute
-     * @param        $value
-     */
-    private function hydrate(string $attribute, $value)
-    {
-        if (class_exists($attribute)) {
-            $this->invoke($attribute);
-        } else if (!empty($this->hydrations)) {
-            $attribute = $this->resolver->normalize($attribute);
-            end($this->hydrations)->assign($attribute, $value);
-        }
+                continue;
+            }
 
-        if (is_array($value)) {
-            $this->traverse($value);
+            if (class_exists($key) && is_array($value)) {
+                $value = $this->hydrateClass($key, $value);
+            }
+
+            if (!empty($this->hydrations)) {
+                end($this->hydrations)->assign($key, $value);
+            }
         }
     }
 
     /**
      * @param string $class
+     * @param array  $values
+     *
+     * @return Hydration
      */
-    private function invoke(string $class)
+    public function hydrateClass(string $class, array $values): Hydration
+    {
+        $hydration = $this->invoke($class);
+
+        return $this->hydrateObject($hydration, $values);
+    }
+
+    /**
+     * @param Hydration $hydration
+     * @param array     $values
+     *
+     * @return Hydration
+     */
+    public function hydrateObject(Hydration $hydration, array $values): Hydration
+    {
+        foreach ($values as $key => $value) {
+            if (is_string($key)) {
+                if (class_exists($key) && is_array($value)) {
+                    $value = $this->hydrateClass($key, $value);
+                }
+
+                $hydration->assign($key, $value);
+            } else if (is_array($value)) {
+                $this->hydrate($value);
+            }
+        }
+
+        return $hydration;
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return Hydration
+     */
+    private function invoke(string $class): Hydration
     {
         $class     = $this->resolver->resolve($class);
         $hydration = new Hydration($class);
 
         $this->assign($hydration);
         $this->hydrations[] = $hydration;
+
+        return $hydration;
     }
 
     /**

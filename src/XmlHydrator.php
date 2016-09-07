@@ -2,7 +2,6 @@
 
 namespace Dgame\Hydrator;
 
-use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMNodeList;
@@ -30,13 +29,11 @@ final class XmlHydrator
     /**
      * XmlHydrator constructor.
      *
-     * @param DOMDocument $document
-     * @param Resolver    $resolver
+     * @param Resolver $resolver
      */
-    public function __construct(DOMDocument $document, Resolver $resolver)
+    public function __construct(Resolver $resolver)
     {
         $this->resolver = $resolver;
-        $this->hydrate($document);
     }
 
     /**
@@ -55,7 +52,7 @@ final class XmlHydrator
     /**
      * @param DOMNode $node
      */
-    private function hydrate(DOMNode $node)
+    public function hydrate(DOMNode $node)
     {
         if ($node->hasChildNodes()) {
             $this->traverse($node->childNodes);

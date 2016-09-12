@@ -51,6 +51,13 @@ class TestHydration extends TestCase
         $this->assertEquals('14.04.1921', $objects[6]->getErstelldatum());
         $this->assertEquals('abc.pdf', $objects[4]->Dateiname);
         $this->assertEquals('def.zip', $objects[5]->Dateiname);
+
+        $this->assertInstanceOf(Transfer::class, $objects[6]);
+        $this->assertInstanceOf(Person::class, $objects[6]->getPerson());
+        $this->assertEquals('Partner', $objects[6]->getPerson()->type);
+        $this->assertEquals('Max Musterman', $objects[6]->getPerson()->getName());
+        $this->assertInstanceOf(Person::class, $objects[7]);
+        $this->assertSame($objects[7], $objects[6]->getPerson());
     }
 
     public function testArrayHydration()
@@ -65,7 +72,17 @@ class TestHydration extends TestCase
                         ['Datei' => ['Dateiname' => 'def.zip']]
                     ],
                 ],
-                ['Transfer' => ['Erstelldatum' => '14.04.1921']]
+                [
+                    'Transfer' => [
+                        'Erstelldatum' => '14.04.1921',
+                        [
+                            'Person' => [
+                                'type' => 'Partner',
+                                'name' => 'Max Musterman'
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ];
 
@@ -93,5 +110,12 @@ class TestHydration extends TestCase
         $this->assertEquals('14.04.1921', $objects[4]->getErstelldatum());
         $this->assertEquals('abc.pdf', $objects[2]->Dateiname);
         $this->assertEquals('def.zip', $objects[3]->Dateiname);
+
+        $this->assertInstanceOf(Transfer::class, $objects[4]);
+        $this->assertInstanceOf(Person::class, $objects[4]->getPerson());
+        $this->assertEquals('Partner', $objects[4]->getPerson()->type);
+        $this->assertEquals('Max Musterman', $objects[4]->getPerson()->getName());
+        $this->assertInstanceOf(Person::class, $objects[5]);
+        $this->assertSame($objects[5], $objects[4]->getPerson());
     }
 }

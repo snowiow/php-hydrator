@@ -50,6 +50,14 @@ final class XmlHydrator
     }
 
     /**
+     * @return Hydration
+     */
+    public function getLastHydratedObject(): Hydration
+    {
+        return end($this->hydrations);
+    }
+
+    /**
      * @param DOMNode $node
      */
     public function hydrate(DOMNode $node)
@@ -73,6 +81,8 @@ final class XmlHydrator
                     $this->hydrateTextNode($node);
                     break;
             }
+
+            $this->hydrateAttributes($node);
         }
     }
 
@@ -81,10 +91,11 @@ final class XmlHydrator
      */
     private function hydrateElementNode(DOMElement $element)
     {
-        if (class_exists($element->tagName)) {
-            $this->invoke($element->tagName);
+        $class = $this->resolver->resolve($element->tagName);
+        if (class_exists($class)) {
+            $this->invoke($class);
         } else {
-            $this->property = trim($element->tagName);
+            $this->property = $class;
         }
 
         $this->hydrate($element);
@@ -96,8 +107,7 @@ final class XmlHydrator
     private function hydrateTextNode(DOMText $text)
     {
         if (!empty($this->property) && !empty($this->hydrations)) {
-            $property = $this->resolver->normalize($this->property);
-            end($this->hydrations)->assign($property, trim($text->nodeValue));
+            $this->getLastHydratedObject()->assign($this->property, trim($text->nodeValue));
         }
     }
 
@@ -124,5 +134,26 @@ final class XmlHydrator
                 break;
             }
         }
+    }
+
+    /**
+     * @param DOMNode $node
+     */
+    private function hydrateAttributes(DOMNode $node)
+    {
+        if ($node->hasAttributes()) {
+            foreach ($node->attributes as $attribute) {
+                $this->assignAttribute($attribute);
+            }
+        }
+    }
+
+    /**
+     * @param DOMNode $node
+     */
+    private function assignAttribute(DOMNode $node)
+    {
+        $property = $this->resolver->resolve($node->nodeName);
+        $this->getLastHydratedObject()->assign($property, trim($node->nodeValue));
     }
 }

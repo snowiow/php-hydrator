@@ -26,7 +26,17 @@ $data = [
                 ['Datei' => ['Dateiname' => 'def.zip']]
             ],
         ],
-        ['Transfer' => ['Erstelldatum' => '14.04.1921']]
+        [
+            'Transfer' => [
+                'Erstelldatum' => '14.04.1921',
+                [
+                    'Person' => [
+                        'type' => 'Partner',
+                        'name' => 'Max Musterman'
+                    ]
+                ]
+            ]
+        ]
     ]
 ];
 

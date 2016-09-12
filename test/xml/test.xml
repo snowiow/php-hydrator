@@ -18,8 +18,11 @@
                 <q:Dateiname>def.zip</q:Dateiname>
             </Datei>
         </Transfer>
-        <Transfer>
+        <Transfer xmlns:z="quatz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <Erstelldatum>14.04.1921</Erstelldatum>
+            <z:Person xsi:type="Partner">
+                <Name>Max Musterman</Name>
+            </z:Person>
         </Transfer>
     </Lieferung>
 </root>

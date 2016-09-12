@@ -3,7 +3,6 @@
 namespace Dgame\Hydrator;
 
 use ReflectionClass;
-use ReflectionException;
 use TypeError;
 
 /**
@@ -66,17 +65,20 @@ final class Hydration
     }
 
     /**
-     * @param string $property
+     * @param string $attribute
      * @param        $value
      *
      * @return bool
      */
-    private function assignByProperty(string $property, $value): bool
+    public function assignByProperty(string $attribute, $value): bool
     {
-        if ($this->reflection->hasProperty($property) && $this->reflection->getProperty($property)->isPublic()) {
-            $this->reflection->getProperty($property)->setValue($this->object, $value);
+        if ($this->reflection->hasProperty($attribute)) {
+            $property = $this->reflection->getProperty($attribute);
+            if ($property->isPublic()) {
+                $property->setValue($this->object, $value);
 
-            return true;
+                return true;
+            }
         }
 
         return false;
@@ -88,24 +90,22 @@ final class Hydration
      *
      * @return bool
      */
-    private function assignByMethod(string $property, $value): bool
+    public function assignByMethod(string $property, $value): bool
     {
         $property = ucfirst($property);
         foreach (self::PREFIXES as $prefix) {
             $method = $prefix . $property;
             if ($this->reflection->hasMethod($method)) {
                 $method = $this->reflection->getMethod($method);
-                if (!$method->isPublic()) {
-                    return false;
-                }
+                if ($method->isPublic() && !$method->isAbstract() && $method->getNumberOfRequiredParameters() <= 1) {
+                    try {
+                        $method->invoke($this->object, $value);
+                    } catch (TypeError $t) {
+                        return false;
+                    }
 
-                try {
-                    $method->invoke($this->object, $value);
-                } catch (TypeError $t) {
-                    return false;
+                    return true;
                 }
-
-                return true;
             }
         }
 

@@ -4,6 +4,7 @@ class Transfer
 {
     private $Erstelldatum;
     private $files = [];
+    private $person;
 
     public function setErstelldatum(string $Erstelldatum)
     {
@@ -15,6 +16,11 @@ class Transfer
         $this->files[] = $datei;
     }
 
+    public function setPerson(Person $person)
+    {
+        $this->person = $person;
+    }
+
     public function getErstelldatum(): string
     {
         return $this->Erstelldatum;
@@ -23,5 +29,10 @@ class Transfer
     public function getFiles(): array
     {
         return $this->files;
+    }
+
+    public function getPerson(): Person
+    {
+        return $this->person;
     }
 }

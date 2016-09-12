@@ -39,7 +39,7 @@ final class Resolver implements Aliasable
     public function normalize(string $name): string
     {
         if (preg_match('#([a-z]+)$#iS', $name, $matches)) {
-            $name = trim($matches[1]);
+            return trim($matches[1]);
         }
 
         return $name;

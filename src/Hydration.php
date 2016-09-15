@@ -2,6 +2,7 @@
 
 namespace Dgame\Hydrator;
 
+use function Dgame\Type\typeof;
 use ReflectionClass;
 use TypeError;
 
@@ -97,12 +98,20 @@ final class Hydration
             $method = $prefix . $property;
             if ($this->reflection->hasMethod($method)) {
                 $method = $this->reflection->getMethod($method);
-                if ($method->isPublic() && !$method->isAbstract() && $method->getNumberOfRequiredParameters() <= 1) {
-                    try {
-                        $method->invoke($this->object, $value);
-                    } catch (TypeError $t) {
+                if ($method->isPublic() && $method->getNumberOfParameters() === 1) {
+                    $parameter = $method->getParameters()[0];
+                    if ($parameter->hasType()) {
+                        $type = (string) $parameter->getType();
+                        if (typeof($value)->isImplicit($type)) {
+                            $method->invoke($this->object, $value);
+
+                            return true;
+                        }
+
                         return false;
                     }
+
+                    $method->invoke($this->object, $value);
 
                     return true;
                 }

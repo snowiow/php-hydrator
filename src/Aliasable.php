@@ -18,5 +18,5 @@ interface Aliasable
      *
      * @return Alias
      */
-    public function use (string $class) : Alias;
+    public function use (string $class): Alias;
 }

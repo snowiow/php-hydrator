@@ -2,9 +2,8 @@
 
 namespace Dgame\Hydrator;
 
-use function Dgame\Type\typeof;
+use Exception;
 use ReflectionClass;
-use TypeError;
 
 /**
  * Class Hydration
@@ -12,8 +11,6 @@ use TypeError;
  */
 final class Hydration
 {
-    const PREFIXES = ['set', 'add', 'append'];
-
     /**
      * @var ReflectionClass
      */
@@ -26,20 +23,19 @@ final class Hydration
     /**
      * Hydration constructor.
      *
-     * @param string $class
+     * @param                 $object
+     * @param ReflectionClass $reflection
+     *
+     * @throws Exception
      */
-    public function __construct(string $class)
+    public function __construct($object, ReflectionClass $reflection)
     {
-        $this->reflection = new ReflectionClass($class);
-        $this->object     = $this->reflection->newInstance();
-    }
+        if (!$reflection->isInstance($object)) {
+            throw new Exception('Invalid object');
+        }
 
-    /**
-     * @return ReflectionClass
-     */
-    public function getReflection(): ReflectionClass
-    {
-        return $this->reflection;
+        $this->reflection = $reflection;
+        $this->object     = $object;
     }
 
     /**
@@ -51,30 +47,26 @@ final class Hydration
     }
 
     /**
-     * @param string $property
+     * @param string $name
      * @param        $value
      *
      * @return bool
      */
-    public function assign(string $property, $value)
+    public function assign(string $name, $value): bool
     {
-        if (!empty($value)) {
-            return $this->assignByProperty($property, $value) || $this->assignByMethod($property, $value);
-        }
-
-        return false;
+        return $this->assignByProperty($name, $value) || $this->assignByMethod($name, $value);
     }
 
     /**
-     * @param string $attribute
+     * @param string $name
      * @param        $value
      *
      * @return bool
      */
-    public function assignByProperty(string $attribute, $value): bool
+    private function assignByProperty(string $name, $value): bool
     {
-        if ($this->reflection->hasProperty($attribute)) {
-            $property = $this->reflection->getProperty($attribute);
+        if ($this->reflection->hasProperty($name)) {
+            $property = $this->reflection->getProperty($name);
             if ($property->isPublic()) {
                 $property->setValue($this->object, $value);
 
@@ -86,31 +78,19 @@ final class Hydration
     }
 
     /**
-     * @param string $property
+     * @param string $name
      * @param        $value
      *
      * @return bool
      */
-    public function assignByMethod(string $property, $value): bool
+    private function assignByMethod(string $name, $value): bool
     {
-        $property = ucfirst($property);
-        foreach (self::PREFIXES as $prefix) {
-            $method = $prefix . $property;
+        $name = ucfirst($name);
+        foreach (['set', 'add', 'append'] as $prefix) {
+            $method = $prefix . $name;
             if ($this->reflection->hasMethod($method)) {
                 $method = $this->reflection->getMethod($method);
-                if ($method->isPublic() && $method->getNumberOfParameters() === 1) {
-                    $parameter = $method->getParameters()[0];
-                    if ($parameter->hasType()) {
-                        $type = (string) $parameter->getType();
-                        if (typeof($value)->isImplicit($type)) {
-                            $method->invoke($this->object, $value);
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-
+                if ($method->isPublic()) {
                     $method->invoke($this->object, $value);
 
                     return true;

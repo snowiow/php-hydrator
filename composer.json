@@ -19,9 +19,7 @@
         "php": ">=7.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "5.*.*",
-        "dgame/php-ensurance": "dev-master",
-        "dgame/php-type": "dev-master"
+        "phpunit/phpunit": "5.*.*"
     },
     "autoload": {
         "classmap": [

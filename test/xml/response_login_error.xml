@@ -1,0 +1,25 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body xmlns:allgemein="http://www.bipro.net/namespace/allgemein"
+               xmlns:wst="http://schemas.xmlsoap.org/ws/2005/02/trust">
+        <soap:Fault>
+            <faultcode>wst:FailedAuthentication</faultcode>
+            <faultstring>Security Fehler - Authentifizierungsdaten ungültig</faultstring>
+            <detail>
+                <allgemein:BiproException>
+                    <allgemein:BiPROVersion>2.1.6.1.1</allgemein:BiPROVersion>
+                    <allgemein:Status>
+                        <allgemein:ProzessID>3831384417187359451</allgemein:ProzessID>
+                        <allgemein:Zeitstempel>2016-09-20T18:44:47</allgemein:Zeitstempel>
+                        <allgemein:StatusID>NOK</allgemein:StatusID>
+                        <allgemein:Schwebe>false</allgemein:Schwebe>
+                        <allgemein:Meldung>
+                            <allgemein:ArtID>Fehler</allgemein:ArtID>
+                            <allgemein:MeldungID>00960</allgemein:MeldungID>
+                            <allgemein:Text>Security Fehler - Authentifizierungsdaten ungültig</allgemein:Text>
+                        </allgemein:Meldung>
+                    </allgemein:Status>
+                </allgemein:BiproException>
+            </detail>
+        </soap:Fault>
+    </soap:Body>
+</soap:Envelope>

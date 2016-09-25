@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Body>
+        <soapenv:Fault>
+            <faultcode>soapenv:Server</faultcode>
+            <faultstring>Fehler bei der Verarbeitung (Technischer Fehler, der bei Service-Abarbeitung auftritt)</faultstring>
+            <detail>
+                <ns2:BiproException xmlns:ns2="http://www.bipro.net/namespace/nachrichten">
+                    <ns2:BiPROVersion>2.5.0.1.0</ns2:BiPROVersion>
+                    <ns2:Status>
+                        <ns2:StatusID>NOK</ns2:StatusID>
+                        <ns2:Schwebe>false</ns2:Schwebe>
+                        <ns2:Meldung>
+                            <ns2:ArtID>Fehler</ns2:ArtID>
+                            <ns2:MeldungID>00930</ns2:MeldungID>
+                        </ns2:Meldung>
+                    </ns2:Status>
+                </ns2:BiproException>
+            </detail>
+        </soapenv:Fault>
+    </soapenv:Body>
+</soapenv:Envelope>

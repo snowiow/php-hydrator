@@ -2,10 +2,11 @@
 
 namespace Dgame\Hydrator;
 
-use DOMElement;
+use DOMDocument;
+use DOMNamedNodeMap;
 use DOMNode;
 use DOMNodeList;
-use DOMText;
+use ReflectionClass;
 
 /**
  * Class XmlHydrator
@@ -14,13 +15,13 @@ use DOMText;
 final class XmlHydrator
 {
     /**
-     * @var Resolver
-     */
-    private $resolver;
-    /**
      * @var string
      */
-    private $property;
+    private $namespacePath;
+    /**
+     * @var array
+     */
+    private $aliase = [];
     /**
      * @var Hydration[]
      */
@@ -29,11 +30,11 @@ final class XmlHydrator
     /**
      * XmlHydrator constructor.
      *
-     * @param Resolver $resolver
+     * @param string|null $namespacePath
      */
-    public function __construct(Resolver $resolver)
+    public function __construct(string $namespacePath = null)
     {
-        $this->resolver = $resolver;
+        $this->namespacePath = rtrim(trim($namespacePath), '\\');
     }
 
     /**
@@ -50,110 +51,174 @@ final class XmlHydrator
     }
 
     /**
-     * @return Hydration
+     * @param array $aliase
      */
-    public function getLastHydratedObject(): Hydration
+    public function alias(array $aliase)
     {
-        return end($this->hydrations);
+        $this->aliase = $aliase;
+    }
+
+    /**
+     * @param DOMDocument $document
+     */
+    public function hydrate(DOMDocument $document)
+    {
+        $this->hydrateNodes($document->childNodes);
+    }
+
+    /**
+     * @param DOMNodeList $nodes
+     */
+    public function hydrateNodes(DOMNodeList $nodes)
+    {
+        for ($i = 0; $i < $nodes->length; $i++) {
+            $node = $nodes->item($i);
+            if ($this->maybeClass($node)) {
+                $this->invoke($node);
+                $this->hydrateNodes($node->childNodes);
+            } else if ($this->maybeProperty($node)) {
+                $this->assign($node->nodeName, $node->nodeValue);
+            }
+
+            if ($node->hasAttributes()) {
+                $this->assignAttributes($node->attributes);
+            }
+        }
     }
 
     /**
      * @param DOMNode $node
+     *
+     * @return bool
      */
-    public function hydrate(DOMNode $node)
+    public function maybeProperty(DOMNode $node): bool
     {
-        if ($node->hasChildNodes()) {
-            $this->traverse($node->childNodes);
+        if ($node->nodeType === XML_ELEMENT_NODE && $node->childNodes->length === 1) {
+            return $node->firstChild->nodeType === XML_TEXT_NODE;
         }
+
+        return false;
     }
 
     /**
-     * @param DOMNodeList $list
+     * @param DOMNode $node
+     *
+     * @return bool
      */
-    private function traverse(DOMNodeList $list)
+    public function maybeClass(DOMNode $node): bool
     {
-        foreach ($list as $node) {
-            switch ($node->nodeType) {
-                case XML_ELEMENT_NODE:
-                    $this->hydrateElementNode($node);
-                    break;
-                case XML_TEXT_NODE:
-                    $this->hydrateTextNode($node);
-                    break;
+        if ($node->nodeType === XML_ELEMENT_NODE && $node->childNodes->length > 0) {
+            foreach ($node->childNodes as $childNode) {
+                if ($childNode->nodeType === XML_ELEMENT_NODE) {
+                    return true;
+                }
             }
-
-            $this->hydrateAttributes($node);
         }
+
+        return false;
     }
 
     /**
-     * @param DOMElement $element
+     * @param DOMNode $node
+     *
+     * @return null|object
      */
-    private function hydrateElementNode(DOMElement $element)
+    public function invoke(DOMNode $node)
     {
-        $class = $this->resolver->resolve($element->tagName);
-        if (class_exists($class)) {
-            $this->invoke($class);
-        } else {
-            $this->property = $class;
+        foreach ($this->assembleClassNames($node->nodeName) as $class) {
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                $object     = $reflection->newInstance();
+
+                $this->assign($class, $object);
+                $this->hydrations[] = new Hydration($object, $reflection);
+
+                return $object;
+            }
         }
 
-        $this->hydrate($element);
-    }
-
-    /**
-     * @param DOMText $text
-     */
-    private function hydrateTextNode(DOMText $text)
-    {
-        if (!empty($this->property) && !empty($this->hydrations)) {
-            $this->getLastHydratedObject()->assign($this->property, trim($text->nodeValue));
-        }
+        return null;
     }
 
     /**
      * @param string $class
+     *
+     * @return array
      */
-    private function invoke(string $class)
+    public function assembleClassNames(string $class): array
     {
-        $class     = $this->resolver->resolve($class);
-        $hydration = new Hydration($class);
+        $output = [];
+        foreach (explode(':', $class) as $item) {
+            $name = $this->extractName($item);
+            if ($name !== null) {
+                $output[] = $this->resolve($name);
+            }
+        }
 
-        $this->assign($hydration);
-        $this->hydrations[] = $hydration;
+        if (count($output) > 1) {
+            return [
+                implode('\\', $output),
+                array_pop($output)
+            ];
+        }
+
+        return $output;
     }
 
     /**
-     * @param Hydration $hydration
+     * @param string $class
+     *
+     * @return string
      */
-    private function assign(Hydration $hydration)
+    private function resolve(string $class): string
     {
+        return array_key_exists($class, $this->aliase) ? $this->aliase[$class] : $class;
+    }
+
+    /**
+     * @param string $name
+     * @param        $value
+     *
+     * @return bool
+     */
+    private function assign(string $name, $value): bool
+    {
+        $name = $this->extractName($name);
+        if ($name === null) {
+            return false;
+        }
+
         for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
-            $property = $hydration->getReflection()->getShortName();
-            if ($this->hydrations[$i]->assign($property, $hydration->getObject())) {
-                break;
+            if ($this->hydrations[$i]->assign($name, $value)) {
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
-     * @param DOMNode $node
+     * @param string $name
+     *
+     * @return null|string
      */
-    private function hydrateAttributes(DOMNode $node)
+    private function extractName(string $name)
     {
-        if ($node->hasAttributes()) {
-            foreach ($node->attributes as $attribute) {
-                $this->assignAttribute($attribute);
-            }
+        if (preg_match('#([a-z_]+[\w_]*)$#iS', $name, $matches)) {
+            return trim($matches[1]);
         }
+
+        return null;
     }
 
     /**
-     * @param DOMNode $node
+     * @param DOMNamedNodeMap $attributes
      */
-    private function assignAttribute(DOMNode $node)
+    private function assignAttributes(DOMNamedNodeMap $attributes)
     {
-        $property = $this->resolver->resolve($node->nodeName);
-        $this->getLastHydratedObject()->assign($property, trim($node->nodeValue));
+        for ($i = 0; $i < $attributes->length; $i++) {
+            $attribute = $attributes->item($i);
+            $this->assign($attribute->nodeName, $attribute->nodeValue);
+        }
     }
 }

@@ -1,0 +1,26 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <transfer:listShipmentsResponse xmlns:transfer="http://www.bipro.net/namespace/transfer"
+                                        xmlns:allgemein="http://www.bipro.net/namespace/allgemein">
+            <transfer:Response>
+                <allgemein:BiPROVersion>2.1.4.1.1</allgemein:BiPROVersion>
+                <allgemein:Status>
+                    <allgemein:ProzessID>8071382149491933860</allgemein:ProzessID>
+                    <allgemein:Zeitstempel>2016-09-20T18:45:16</allgemein:Zeitstempel>
+                    <allgemein:StatusID>NOK</allgemein:StatusID>
+                    <allgemein:Schwebe>false</allgemein:Schwebe>
+                    <allgemein:Meldung>
+                        <allgemein:ArtID>Fehler</allgemein:ArtID>
+                        <allgemein:MeldungID>00960</allgemein:MeldungID>
+                        <allgemein:Text>Security Fehler - Authentifizierungsdaten ungültig</allgemein:Text>
+                    </allgemein:Meldung>
+                    <allgemein:Meldung>
+                        <allgemein:ArtID>Hinweis</allgemein:ArtID>
+                        <allgemein:MeldungID>00962</allgemein:MeldungID>
+                        <allgemein:Text>Der Token ist ungültig.</allgemein:Text>
+                    </allgemein:Meldung>
+                </allgemein:Status>
+            </transfer:Response>
+        </transfer:listShipmentsResponse>
+    </soap:Body>
+</soap:Envelope>

@@ -1,7 +1,5 @@
 <?php
 
-use Dgame\Hydrator\ArrayHydrator;
-use Dgame\Hydrator\Resolver;
 use Dgame\Hydrator\XmlHydrator;
 use PHPUnit\Framework\TestCase;
 
@@ -14,8 +12,7 @@ class TestHydration extends TestCase
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
 
-        $resolver = new Resolver();
-        $hydrator = new XmlHydrator($resolver);
+        $hydrator = new XmlHydrator();
 
         $hydrator->hydrate($doc);
         $objects = $hydrator->getHydratedObjects();
@@ -60,6 +57,7 @@ class TestHydration extends TestCase
         $this->assertSame($objects[7], $objects[6]->getPerson());
     }
 
+    /*
     public function testArrayHydration()
     {
         $data = [
@@ -118,4 +116,5 @@ class TestHydration extends TestCase
         $this->assertInstanceOf(Person::class, $objects[5]);
         $this->assertSame($objects[5], $objects[4]->getPerson());
     }
+    */
 }

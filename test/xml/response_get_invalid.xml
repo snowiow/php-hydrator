@@ -1,0 +1,22 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
+    <soap:Body>
+        <transfer:getShipmentResponse xmlns:allgemein="http://www.bipro.net/namespace/allgemein"
+                                      xmlns:transfer="http://www.bipro.net/namespace/transfer">
+            <transfer:Response>
+                <allgemein:BiPROVersion>2.1.4.1.1</allgemein:BiPROVersion>
+                <allgemein:Status>
+                    <allgemein:ProzessID>5513175926080976173</allgemein:ProzessID>
+                    <allgemein:Zeitstempel>2016-09-20T18:47:06</allgemein:Zeitstempel>
+                    <allgemein:StatusID>NOK</allgemein:StatusID>
+                    <allgemein:Schwebe>false</allgemein:Schwebe>
+                    <allgemein:Meldung>
+                        <allgemein:ArtID>Fehler</allgemein:ArtID>
+                        <allgemein:MeldungID>04003</allgemein:MeldungID>
+                        <allgemein:Text>Lieferung mit angefragter ID nicht gefunden!</allgemein:Text>
+                    </allgemein:Meldung>
+                </allgemein:Status>
+            </transfer:Response>
+        </transfer:getShipmentResponse>
+    </soap:Body>
+</soap:Envelope>

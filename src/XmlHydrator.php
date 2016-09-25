@@ -38,6 +38,14 @@ final class XmlHydrator
     }
 
     /**
+     *
+     */
+    public function reset()
+    {
+        $this->hydrations = [];
+    }
+
+    /**
      * @return object[]
      */
     public function getHydratedObjects(): array

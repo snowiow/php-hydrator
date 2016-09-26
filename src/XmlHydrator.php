@@ -15,13 +15,9 @@ use ReflectionClass;
 final class XmlHydrator
 {
     /**
-     * @var string
+     * @var Resolver
      */
-    private $namespacePath;
-    /**
-     * @var array
-     */
-    private $aliase = [];
+    private $resolver;
     /**
      * @var Hydration[]
      */
@@ -30,11 +26,11 @@ final class XmlHydrator
     /**
      * XmlHydrator constructor.
      *
-     * @param string|null $namespacePath
+     * @param Resolver $resolver
      */
-    public function __construct(string $namespacePath = null)
+    public function __construct(Resolver $resolver)
     {
-        $this->namespacePath = rtrim(trim($namespacePath), '\\');
+        $this->resolver = $resolver;
     }
 
     /**
@@ -56,14 +52,6 @@ final class XmlHydrator
         }
 
         return $objects;
-    }
-
-    /**
-     * @param array $aliase
-     */
-    public function alias(array $aliase)
-    {
-        $this->aliase = $aliase;
     }
 
     /**
@@ -133,54 +121,19 @@ final class XmlHydrator
      */
     public function invoke(DOMNode $node)
     {
-        foreach ($this->assembleClassNames($node->nodeName) as $class) {
-            if (class_exists($class)) {
-                $reflection = new ReflectionClass($class);
-                $object     = $reflection->newInstance();
+        $class = str_replace(':', '\\', $node->nodeName);
+        $class = $this->resolver->resolve($class);
+        if (class_exists($class)) {
+            $reflection = new ReflectionClass($class);
+            $object     = $reflection->newInstance();
 
-                $this->assign($class, $object);
-                $this->hydrations[] = new Hydration($object, $reflection);
+            $this->assign($class, $object);
+            $this->hydrations[] = new Hydration($object, $reflection);
 
-                return $object;
-            }
+            return $object;
         }
 
         return null;
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return array
-     */
-    public function assembleClassNames(string $class): array
-    {
-        $output = [];
-        foreach (explode(':', $class) as $item) {
-            $name = $this->extractName($item);
-            if ($name !== null) {
-                $output[] = $this->resolve($name);
-            }
-        }
-
-        if (count($output) > 1) {
-            return [
-                implode('\\', $output),
-                array_pop($output)
-            ];
-        }
-
-        return $output;
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return string
-     */
-    private function resolve(string $class): string
-    {
-        return array_key_exists($class, $this->aliase) ? $this->aliase[$class] : $class;
     }
 
     /**
@@ -191,9 +144,8 @@ final class XmlHydrator
      */
     private function assign(string $name, $value): bool
     {
-        $name = $this->extractName($name);
-        if ($name === null) {
-            return false;
+        if (($pos = strpos($name, ':')) !== false) {
+            $name = substr($name, $pos + 1);
         }
 
         for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
@@ -203,20 +155,6 @@ final class XmlHydrator
         }
 
         return false;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return null|string
-     */
-    private function extractName(string $name)
-    {
-        if (preg_match('#([a-z_]+[\w_]*)$#iS', $name, $matches)) {
-            return trim($matches[1]);
-        }
-
-        return null;
     }
 
     /**

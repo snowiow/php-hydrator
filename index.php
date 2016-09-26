@@ -1,5 +1,6 @@
 <?php
 
+use Dgame\Hydrator\Resolver;
 use Dgame\Hydrator\XmlHydrator;
 
 require_once 'vendor/autoload.php';
@@ -7,10 +8,10 @@ require_once 'vendor/autoload.php';
 $doc = new DOMDocument('1.0', 'utf-8');
 $doc->load('test/xml/test.xml');
 
-//$resolver = new Resolver();
+$resolver = new Resolver();
 
 print '<pre>';
-$hydrator = new XmlHydrator();
+$hydrator = new XmlHydrator($resolver);
 $hydrator->hydrate($doc);
 print_r($hydrator->getHydratedObjects());
 

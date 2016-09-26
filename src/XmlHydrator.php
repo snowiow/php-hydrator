@@ -121,6 +121,7 @@ final class XmlHydrator
      */
     public function invoke(DOMNode $node)
     {
+        // string($node->nodeName)->replace([':' => '\\'])->get();
         $class = str_replace(':', '\\', $node->nodeName);
         $class = $this->resolver->resolve($class);
         if (class_exists($class)) {
@@ -144,6 +145,7 @@ final class XmlHydrator
      */
     private function assign(string $name, $value): bool
     {
+        //string($name)->contains(':', $pos) / string($name)->after(':')->default($name);
         if (($pos = strpos($name, ':')) !== false) {
             $name = substr($name, $pos + 1);
         }

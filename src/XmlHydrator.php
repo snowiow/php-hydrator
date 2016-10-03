@@ -7,6 +7,7 @@ use DOMNamedNodeMap;
 use DOMNode;
 use DOMNodeList;
 use ReflectionClass;
+use function Dgame\Wrapper\string;
 
 /**
  * Class XmlHydrator
@@ -73,7 +74,7 @@ final class XmlHydrator
                 $this->invoke($node);
                 $this->hydrateNodes($node->childNodes);
             } else if ($this->maybeProperty($node)) {
-                $this->assign($node->nodeName, $node->nodeValue);
+                $this->assignProperty($node->nodeName, $node->nodeValue);
             }
 
             if ($node->hasAttributes()) {
@@ -121,20 +122,47 @@ final class XmlHydrator
      */
     public function invoke(DOMNode $node)
     {
-        // string($node->nodeName)->replace([':' => '\\'])->get();
-        $class = str_replace(':', '\\', $node->nodeName);
-        $class = $this->resolver->resolve($class);
-        if (class_exists($class)) {
-            $reflection = new ReflectionClass($class);
-            $object     = $reflection->newInstance();
+        foreach ($this->getPossibleClassesFor($node) as $class) {
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                $object     = $reflection->newInstance();
 
-            $this->assign($class, $object);
-            $this->hydrations[] = new Hydration($object, $reflection);
+                $this->assign($class, $object);
+                $this->hydrations[] = new Hydration($object, $reflection);
 
-            return $object;
+                return $object;
+            }
         }
 
         return null;
+    }
+
+    /**
+     * @param DOMNode $node
+     *
+     * @return array
+     */
+    private function getPossibleClassesFor(DOMNode $node): array
+    {
+        $classes = [
+            string($node->nodeName)->after(':')->get(),
+            string($node->nodeName)->replace([':' => '\\'])->get()
+        ];
+
+        return array_map([$this->resolver, 'resolve'], array_filter($classes));
+    }
+
+    /**
+     * @param string $name
+     * @param        $value
+     *
+     * @return bool
+     */
+    private function assignProperty(string $name, $value): bool
+    {
+        $name = string($name)->after(':')->default($name)->get();
+
+        return $this->assign($name, $value);
     }
 
     /**
@@ -145,11 +173,6 @@ final class XmlHydrator
      */
     private function assign(string $name, $value): bool
     {
-        //string($name)->contains(':', $pos) / string($name)->after(':')->default($name);
-        if (($pos = strpos($name, ':')) !== false) {
-            $name = substr($name, $pos + 1);
-        }
-
         for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
             if ($this->hydrations[$i]->assign($name, $value)) {
                 return true;
@@ -166,7 +189,7 @@ final class XmlHydrator
     {
         for ($i = 0; $i < $attributes->length; $i++) {
             $attribute = $attributes->item($i);
-            $this->assign($attribute->nodeName, $attribute->nodeValue);
+            $this->assignProperty($attribute->nodeName, $attribute->nodeValue);
         }
     }
 }

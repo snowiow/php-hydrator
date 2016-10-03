@@ -2,6 +2,9 @@
 
 namespace Dgame\Hydrator;
 
+use function Dgame\Wrapper\assoc;
+use function Dgame\Wrapper\string;
+
 /**
  * Class Resolver
  * @package Dgame\Hydrator
@@ -24,7 +27,7 @@ final class Resolver
      */
     public function __construct(string $namespacePath = null)
     {
-        $this->namespacePath = rtrim(trim($namespacePath), '\\');
+        $this->namespacePath = string($namespacePath)->rightTrim('\\')->trim()->get();
     }
 
     /**
@@ -50,6 +53,11 @@ final class Resolver
      */
     public function resolve(string $class): string
     {
-        return array_key_exists($class, $this->aliase) ? $this->aliase[$class] : $class;
+        $class = assoc($this->aliase)->hasKey($class) ? $this->aliase[$class] : $class;
+        if (empty($this->namespacePath)) {
+            return $class;
+        }
+
+        return string('%s\\%s')->format($this->namespacePath, $class);
     }
 }

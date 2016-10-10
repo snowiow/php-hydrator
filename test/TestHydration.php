@@ -1,5 +1,6 @@
 <?php
 
+use Dgame\Hydrator\Resolver;
 use Dgame\Hydrator\XmlHydrator;
 use PHPUnit\Framework\TestCase;
 
@@ -12,7 +13,7 @@ class TestHydration extends TestCase
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
 
-        $hydrator = new XmlHydrator();
+        $hydrator = new XmlHydrator(new Resolver());
 
         $hydrator->hydrate($doc);
         $objects = $hydrator->getHydratedObjects();

@@ -2,6 +2,7 @@
 
 namespace Dgame\Hydrator;
 
+use function Dgame\Wrapper\string;
 use Exception;
 use ReflectionClass;
 
@@ -11,6 +12,8 @@ use ReflectionClass;
  */
 final class Hydration
 {
+    const PREFIXES = ['set', 'add', 'append'];
+
     /**
      * @var ReflectionClass
      */
@@ -85,8 +88,8 @@ final class Hydration
      */
     private function assignByMethod(string $name, $value): bool
     {
-        $name = ucfirst($name);
-        foreach (['set', 'add', 'append'] as $prefix) {
+        $name = string($name)->toUpperFirst()->get();
+        foreach (self::PREFIXES as $prefix) {
             $method = $prefix . $name;
             if ($this->reflection->hasMethod($method)) {
                 $method = $this->reflection->getMethod($method);

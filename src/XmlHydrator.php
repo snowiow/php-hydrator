@@ -6,6 +6,7 @@ use DOMDocument;
 use DOMNamedNodeMap;
 use DOMNode;
 use DOMNodeList;
+use function Dgame\Wrapper\assoc;
 use function Dgame\Wrapper\string;
 
 /**
@@ -103,7 +104,7 @@ final class XmlHydrator extends Hydrator
             string($node->nodeName)->replace([':' => '\\'])->get()
         ];
 
-        return array_map([$this->resolver, 'resolve'], array_filter($classes));
+        return assoc($classes)->filterEmpty()->map([$this->resolver, 'resolve'])->get();
     }
 
     /**

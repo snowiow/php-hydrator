@@ -1,0 +1,23 @@
+{
+    "id": 123,
+    "Transfer": [
+        {
+            "Erstelldatum": "11.11.1911",
+            "Datei": [
+                {
+                    "Dateiname": "abc.pdf"
+                },
+                {
+                    "Dateiname": "def.zip"
+                }
+            ]
+        },
+        {
+            "Erstelldatum": "14.04.1921",
+            "Person": {
+                "type": "Partner",
+                "name": "Max Musterman"
+            }
+        }
+    ]
+}

@@ -18,7 +18,8 @@
     "require": {
         "php": ">=7.0",
         "dgame/php-function-wrapper": "dev-master",
-        "dgame/php-optional": "@dev"
+        "dgame/php-optional": "@dev",
+        "dgame/php-type": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*.*"

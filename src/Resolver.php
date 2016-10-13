@@ -19,6 +19,10 @@ final class Resolver
      * @var array
      */
     private $aliase = [];
+    /**
+     * @var array
+     */
+    private $prefixes = ['set', 'add', 'append'];
 
     /**
      * XmlHydrator constructor.
@@ -59,5 +63,29 @@ final class Resolver
         }
 
         return string('%s\\%s')->format($this->namespacePath, $class);
+    }
+
+    /**
+     * @param array $prefixes
+     */
+    public function setPrefixes(array $prefixes)
+    {
+        $this->prefixes = $prefixes;
+    }
+
+    /**
+     * @param array $prefixes
+     */
+    public function appendPrefixes(array $prefixes)
+    {
+        $this->prefixes = assoc($this->prefixes)->mergeWith($prefixes)->get();
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrefixes(): array
+    {
+        return $this->prefixes;
     }
 }

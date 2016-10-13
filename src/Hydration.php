@@ -2,9 +2,9 @@
 
 namespace Dgame\Hydrator;
 
-use function Dgame\Wrapper\string;
 use Exception;
 use ReflectionClass;
+use function Dgame\Wrapper\string;
 
 /**
  * Class Hydration
@@ -12,8 +12,6 @@ use ReflectionClass;
  */
 final class Hydration
 {
-    const PREFIXES = ['set', 'add', 'append'];
-
     /**
      * @var ReflectionClass
      */
@@ -22,16 +20,21 @@ final class Hydration
      * @var object
      */
     private $object;
+    /**
+     * @var array
+     */
+    private $prefixes = [];
 
     /**
      * Hydration constructor.
      *
      * @param                 $object
      * @param ReflectionClass $reflection
+     * @param array           $prefixes
      *
      * @throws Exception
      */
-    public function __construct($object, ReflectionClass $reflection)
+    public function __construct($object, ReflectionClass $reflection, array $prefixes)
     {
         if (!$reflection->isInstance($object)) {
             throw new Exception('Invalid object');
@@ -39,6 +42,7 @@ final class Hydration
 
         $this->reflection = $reflection;
         $this->object     = $object;
+        $this->prefixes   = $prefixes;
     }
 
     /**
@@ -88,8 +92,8 @@ final class Hydration
      */
     private function assignByMethod(string $name, $value): bool
     {
-        $name = string($name)->toUpperFirst()->get();
-        foreach (self::PREFIXES as $prefix) {
+        $name = string($name)->asCapitalized()->get();
+        foreach ($this->prefixes as $prefix) {
             $method = $prefix . $name;
             if ($this->reflection->hasMethod($method)) {
                 $method = $this->reflection->getMethod($method);

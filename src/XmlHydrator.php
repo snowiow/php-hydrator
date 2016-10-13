@@ -6,55 +6,14 @@ use DOMDocument;
 use DOMNamedNodeMap;
 use DOMNode;
 use DOMNodeList;
-use ReflectionClass;
 use function Dgame\Wrapper\string;
 
 /**
  * Class XmlHydrator
  * @package Dgame\Hydrator
  */
-final class XmlHydrator
+final class XmlHydrator extends Hydrator
 {
-    /**
-     * @var Resolver
-     */
-    private $resolver;
-    /**
-     * @var Hydration[]
-     */
-    private $hydrations = [];
-
-    /**
-     * XmlHydrator constructor.
-     *
-     * @param Resolver $resolver
-     */
-    public function __construct(Resolver $resolver)
-    {
-        $this->resolver = $resolver;
-    }
-
-    /**
-     *
-     */
-    public function reset()
-    {
-        $this->hydrations = [];
-    }
-
-    /**
-     * @return object[]
-     */
-    public function getHydratedObjects(): array
-    {
-        $objects = [];
-        foreach ($this->hydrations as $hydration) {
-            $objects[] = $hydration->getObject();
-        }
-
-        return $objects;
-    }
-
     /**
      * @param DOMDocument $document
      */
@@ -71,7 +30,7 @@ final class XmlHydrator
         for ($i = 0; $i < $nodes->length; $i++) {
             $node = $nodes->item($i);
             if ($this->maybeClass($node)) {
-                $this->invoke($node);
+                $this->invokeNode($node);
                 $this->hydrateNodes($node->childNodes);
             } else if ($this->maybeProperty($node)) {
                 $this->assignProperty($node->nodeName, $node->nodeValue);
@@ -91,7 +50,7 @@ final class XmlHydrator
     public function maybeProperty(DOMNode $node): bool
     {
         if ($node->nodeType === XML_ELEMENT_NODE && $node->childNodes->length === 1) {
-            return $node->firstChild->nodeType === XML_TEXT_NODE;
+            return $node->firstChild->nodeType === XML_TEXT_NODE && $this->isValidName($node->nodeName);
         }
 
         return false;
@@ -107,7 +66,7 @@ final class XmlHydrator
         if ($node->nodeType === XML_ELEMENT_NODE && $node->childNodes->length > 0) {
             foreach ($node->childNodes as $childNode) {
                 if ($childNode->nodeType === XML_ELEMENT_NODE) {
-                    return true;
+                    return $this->isValidName($node->nodeName);
                 }
             }
         }
@@ -120,16 +79,11 @@ final class XmlHydrator
      *
      * @return null|object
      */
-    public function invoke(DOMNode $node)
+    public function invokeNode(DOMNode $node)
     {
-        foreach ($this->getPossibleClassesFor($node) as $class) {
-            if (class_exists($class)) {
-                $reflection = new ReflectionClass($class);
-                $object     = $reflection->newInstance();
-
-                $this->assign($class, $object);
-                $this->hydrations[] = new Hydration($object, $reflection);
-
+        foreach ($this->resolveNode($node) as $class) {
+            $object = $this->invoke($class);
+            if ($object !== null) {
                 return $object;
             }
         }
@@ -142,7 +96,7 @@ final class XmlHydrator
      *
      * @return array
      */
-    private function getPossibleClassesFor(DOMNode $node): array
+    private function resolveNode(DOMNode $node): array
     {
         $classes = [
             string($node->nodeName)->after(':')->get(),
@@ -163,23 +117,6 @@ final class XmlHydrator
         $name = string($name)->after(':')->default($name)->get();
 
         return $this->assign($name, $value);
-    }
-
-    /**
-     * @param string $name
-     * @param        $value
-     *
-     * @return bool
-     */
-    private function assign(string $name, $value): bool
-    {
-        for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
-            if ($this->hydrations[$i]->assign($name, $value)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

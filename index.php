@@ -1,5 +1,6 @@
 <?php
 
+use Dgame\Hydrator\ArrayHydrator;
 use Dgame\Hydrator\Resolver;
 use Dgame\Hydrator\XmlHydrator;
 
@@ -13,16 +14,40 @@ $resolver = new Resolver();
 print '<pre>';
 $hydrator = new XmlHydrator($resolver);
 $hydrator->hydrate($doc);
-print_r($hydrator->getHydratedObjects());
+//print_r($hydrator->getHydratedObjects());
 
 $data = [
     'Lieferung' => [
         'id' => 123,
-        ['Transfer' => ['Erstelldatum' => '11.11.1911', ['Datei' => ['Dateiname' => 'abc.pdf']], ['Datei' => ['Dateiname' => 'def.zip']]]],
-        ['Transfer' => ['Erstelldatum' => '14.04.1921', ['Person' => ['type' => 'Partner', 'name' => 'Max Musterman']]]]
+        [
+            'Transfer' => [
+                'Erstelldatum' => '11.11.1911',
+                [
+                    'Datei' => [
+                        'Dateiname' => 'abc.pdf'
+                    ]
+                ],
+                [
+                    'Datei' => [
+                        'Dateiname' => 'def.zip'
+                    ]
+                ]
+            ]
+        ],
+        [
+            'Transfer' => [
+                'Erstelldatum' => '14.04.1921',
+                [
+                    'Person' => [
+                        'type' => 'Partner',
+                        'name' => 'Max Musterman'
+                    ]
+                ]
+            ]
+        ]
     ]
 ];
-//
-//$hydrator = new ArrayHydrator($resolver);
-//$hydrator->hydrate($data);
-//print_r($hydrator->getHydratedObjects());
+
+$hydrator = new ArrayHydrator($resolver);
+$hydrator->hydrate($data);
+print_r($hydrator->getHydratedObjects());

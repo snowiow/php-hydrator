@@ -92,7 +92,7 @@ final class Hydration
      */
     private function assignByMethod(string $name, $value): bool
     {
-        $name = string($name)->asCapitalized()->get();
+        $name = string($name)->upperCaseFirst()->get();
         foreach ($this->prefixes as $prefix) {
             $method = $prefix . $name;
             if ($this->reflection->hasMethod($method)) {

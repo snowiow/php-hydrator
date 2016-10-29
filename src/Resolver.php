@@ -57,12 +57,12 @@ final class Resolver
      */
     public function resolve(string $class): string
     {
-        $class = assoc($this->aliase)->hasKey($class) ? $this->aliase[$class] : $class;
+        $class = assoc($this->aliase)->valueOf($class)->default($class);
         if (empty($this->namespacePath)) {
             return $class;
         }
 
-        return string('%s\\%s')->format($this->namespacePath, $class);
+        return string('%s\\%s')->format($this->namespacePath, $class)->get();
     }
 
     /**

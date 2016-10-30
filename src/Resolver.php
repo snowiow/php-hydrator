@@ -11,18 +11,28 @@ use function Dgame\Wrapper\string;
  */
 final class Resolver
 {
+    const PREFIXES = ['set', 'add', 'append'];
+
     /**
      * @var string
      */
     private $namespacePath;
     /**
-     * @var array
+     * @var \Dgame\Wrapper\ArrayWrapper
      */
-    private $aliase = [];
+    private $aliase;
     /**
-     * @var array
+     * @var \Dgame\Wrapper\ArrayWrapper
      */
-    private $prefixes = ['set', 'add', 'append'];
+    private $prefixes;
+    /**
+     * @var \Dgame\Wrapper\ArrayWrapper
+     */
+    private $methods;
+    /**
+     * @var bool
+     */
+    private $magic = true;
 
     /**
      * XmlHydrator constructor.
@@ -31,6 +41,9 @@ final class Resolver
      */
     public function __construct(string $namespacePath = null)
     {
+        $this->aliase        = assoc([]);
+        $this->prefixes      = assoc(self::PREFIXES);
+        $this->methods       = assoc([]);
         $this->namespacePath = string($namespacePath)->rightTrim('\\')->trim()->get();
     }
 
@@ -43,11 +56,117 @@ final class Resolver
     }
 
     /**
-     * @param array $aliase
+     * @param string $alias
+     *
+     * @return AliasProcedure
      */
-    public function alias(array $aliase)
+    public function useAlias(string $alias): AliasProcedure
     {
-        $this->aliase = $aliase;
+        return new AliasProcedure($this, $alias);
+    }
+
+    /**
+     * @param array $aliase
+     *
+     * @return Resolver
+     */
+    public function setAliase(array $aliase): Resolver
+    {
+        $this->aliase = assoc($aliase);
+
+        return $this;
+    }
+
+    /**
+     * @param array $aliase
+     *
+     * @return Resolver
+     */
+    public function appendAliase(array $aliase): Resolver
+    {
+        $this->aliase = $this->aliase->merge($aliase);
+
+        return $this;
+    }
+
+    /**
+     * @param array $prefixes
+     *
+     * @return Resolver
+     */
+    public function setPrefixes(array $prefixes): Resolver
+    {
+        $this->prefixes = $this->prefixes->merge($prefixes);
+
+        return $this;
+    }
+
+    /**
+     * @param array $prefixes
+     *
+     * @return Resolver
+     */
+    public function appendPrefixes(array $prefixes): Resolver
+    {
+        $this->prefixes = $this->prefixes->merge($prefixes);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrefixes(): array
+    {
+        return $this->prefixes->get();
+    }
+
+    /**
+     * @param array $methods
+     *
+     * @return Resolver
+     */
+    public function setMethods(array $methods): Resolver
+    {
+        $this->methods = $methods;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMethods(): array
+    {
+        return $this->methods->get();
+    }
+
+    /**
+     * @return Resolver
+     */
+    public function enableMagic(): Resolver
+    {
+        $this->magic = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Resolver
+     */
+    public function disableMagic(): Resolver
+    {
+        $this->magic = false;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMagicAllowed(): bool
+    {
+        return $this->magic;
     }
 
     /**
@@ -57,35 +176,11 @@ final class Resolver
      */
     public function resolve(string $class): string
     {
-        $class = assoc($this->aliase)->valueOf($class)->default($class);
+        $class = $this->aliase->valueOf($class)->default($class);
         if (empty($this->namespacePath)) {
             return $class;
         }
 
         return string('%s\\%s')->format($this->namespacePath, $class)->get();
-    }
-
-    /**
-     * @param array $prefixes
-     */
-    public function setPrefixes(array $prefixes)
-    {
-        $this->prefixes = $prefixes;
-    }
-
-    /**
-     * @param array $prefixes
-     */
-    public function appendPrefixes(array $prefixes)
-    {
-        $this->prefixes = assoc($this->prefixes)->mergeWith($prefixes)->get();
-    }
-
-    /**
-     * @return array
-     */
-    public function getPrefixes(): array
-    {
-        return $this->prefixes;
     }
 }

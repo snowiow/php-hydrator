@@ -65,7 +65,7 @@ abstract class Hydrator
             $this->hydrations[] = new Hydration(
                 $object,
                 $reflection,
-                $this->resolver->getPrefixes()
+                $this->resolver
             );
 
             return $object;

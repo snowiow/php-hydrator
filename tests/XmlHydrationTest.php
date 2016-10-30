@@ -13,7 +13,10 @@ class XmlHydrationTest extends TestCase
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
 
-        $hydrator = new XmlHydrator(new Resolver());
+        $resolver = new Resolver();
+        $resolver->enableMagic()
+                 ->useAlias('Proxy')->for('Event');
+        $hydrator = new XmlHydrator($resolver);
 
         $hydrator->hydrate($doc);
         $objects = $hydrator->getHydratedObjects();
@@ -25,6 +28,8 @@ class XmlHydrationTest extends TestCase
         $this->assertInstanceOf(Datei::class, $objects[4]);
         $this->assertInstanceOf(Datei::class, $objects[5]);
         $this->assertInstanceOf(Transfer::class, $objects[6]);
+        $this->assertInstanceOf(Person::class, $objects[7]);
+        $this->assertInstanceOf(Proxy::class, $objects[8]);
 
         $this->assertInstanceOf(Meldung::class, $objects[0]->Meldung);
         $this->assertCount(2, $objects[2]->getTransfers());
@@ -56,5 +61,8 @@ class XmlHydrationTest extends TestCase
         $this->assertEquals('Max Musterman', $objects[6]->getPerson()->getName());
         $this->assertInstanceOf(Person::class, $objects[7]);
         $this->assertSame($objects[7], $objects[6]->getPerson());
+
+        $this->assertEquals('Foo', $objects[8]->name);
+        $this->assertEquals(200, $objects[8]->code);
     }
 }

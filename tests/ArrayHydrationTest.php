@@ -1,6 +1,11 @@
 <?php
 
+use Bipro\Datei;
+use Bipro\Lieferung;
+use Bipro\Person;
+use Bipro\Transfer;
 use Dgame\Hydrator\ArrayHydrator;
+use Dgame\Hydrator\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class ArrayHydrationTest extends TestCase
@@ -30,6 +35,8 @@ class ArrayHydrationTest extends TestCase
                 ]
             ]
         ];
+
+        Resolver::new()->appendNamespace('Bipro')->enableMagic();
 
         $hydrator = new ArrayHydrator();
 

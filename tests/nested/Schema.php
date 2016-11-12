@@ -1,11 +1,7 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Bjarne
- * Date: 12.11.2016
- * Time: 02:55
- */
+namespace Nested;
+
 class Schema
 {
     public $complex;

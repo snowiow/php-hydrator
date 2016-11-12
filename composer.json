@@ -29,7 +29,9 @@
             "tests/"
         ],
         "psr-4": {
-            "Dgame\\Hydrator\\": "src/"
+            "Dgame\\Hydrator\\": "src/",
+            "Bipro\\": "test/bipro",
+            "Nested\\": "test/nested"
         }
     }
 }

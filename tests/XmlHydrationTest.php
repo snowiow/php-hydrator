@@ -1,7 +1,17 @@
 <?php
 
+use Bipro\Datei;
+use Bipro\Lieferung;
+use Bipro\Meldung;
+use Bipro\Person;
+use Bipro\Proxy;
+use Bipro\Status;
+use Bipro\Transfer;
 use Dgame\Hydrator\Resolver;
 use Dgame\Hydrator\XmlHydrator;
+use Nested\Complex;
+use Nested\Schema;
+use Nested\Sequence;
 use PHPUnit\Framework\TestCase;
 
 require_once '../vendor/autoload.php';
@@ -13,7 +23,8 @@ class XmlHydrationTest extends TestCase
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
 
-        Resolver::instance()->enableMagic()->useAlias('Proxy')->for('Event');
+        Resolver::new()->appendNamespace('Bipro')->enableMagic()->useAlias('Proxy')->for('Event');
+
         $hydrator = new XmlHydrator();
 
         $hydrator->hydrate($doc);
@@ -68,6 +79,8 @@ class XmlHydrationTest extends TestCase
     {
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/nested.xml');
+
+        Resolver::new()->appendNamespace('Nested');
 
         $hydrator = new XmlHydrator();
         $hydrator->hydrate($doc);

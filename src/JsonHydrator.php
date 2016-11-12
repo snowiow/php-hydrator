@@ -23,8 +23,10 @@ final class JsonHydrator extends Hydrator
      */
     private function hydrateClass(string $class, array $attributes)
     {
-        $this->tryToInvoke($class);
-        $this->hydrateAttributes($class, $attributes);
+        $object = $this->tryToInvokeOne(Resolver::instance()->getClassNamesOf($class));
+        if ($object !== null) {
+            $this->hydrateAttributes($class, $attributes);
+        }
     }
 
     /**

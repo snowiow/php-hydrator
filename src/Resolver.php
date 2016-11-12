@@ -47,10 +47,20 @@ final class Resolver
     /**
      * @return Resolver
      */
+    public static function new(): Resolver
+    {
+        self::$instance = new self();
+
+        return self::$instance;
+    }
+
+    /**
+     * @return Resolver
+     */
     public static function instance(): Resolver
     {
         if (self::$instance === null) {
-            self::$instance = new self();
+            return self::new();
         }
 
         return self::$instance;

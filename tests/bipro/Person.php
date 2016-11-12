@@ -1,5 +1,7 @@
 <?php
 
+namespace Bipro;
+
 class Person
 {
     public $type;

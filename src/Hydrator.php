@@ -50,6 +50,23 @@ abstract class Hydrator
     }
 
     /**
+     * @param array $classes
+     *
+     * @return null|object
+     */
+    final public function tryToInvokeOne(array $classes)
+    {
+        foreach ($classes as $class) {
+            $object = $this->tryToInvoke($class);
+            if ($object !== null) {
+                return $object;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param string $class
      *
      * @return null|object
@@ -61,15 +78,21 @@ abstract class Hydrator
             $object     = $reflection->newInstance();
 
             $this->assign($class, $object);
-
-            $hydration          = new Hydration($object, $reflection);
-            $this->hydrations[] = $hydration;
-            $this->scope->push($hydration);
+            $this->append(new Hydration($object, $reflection));
 
             return $object;
         }
 
         return null;
+    }
+
+    /**
+     * @param Hydration $hydration
+     */
+    private function append(Hydration $hydration)
+    {
+        $this->hydrations[] = $hydration;
+        $this->scope->push($hydration);
     }
 
     /**

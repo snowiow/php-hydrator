@@ -6,7 +6,6 @@ use Exception;
 use ReflectionClass;
 use function Dgame\Wrapper\assoc;
 use function Dgame\Wrapper\string;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Class Hydration

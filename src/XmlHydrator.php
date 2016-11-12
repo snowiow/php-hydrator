@@ -102,14 +102,9 @@ final class XmlHydrator extends Hydrator
      */
     public function invokeNode(DOMNode $node)
     {
-        foreach ($this->getClassNamesOf($node) as $class) {
-            $object = $this->tryToInvoke($class);
-            if ($object !== null) {
-                return $object;
-            }
-        }
+        $classes = $this->getClassNamesOf($node);
 
-        return null;
+        return $this->tryToInvokeOne($classes);
     }
 
     /**

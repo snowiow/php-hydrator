@@ -1,6 +1,11 @@
 <?php
 
+use Bipro\Datei;
+use Bipro\Lieferung;
+use Bipro\Person;
+use Bipro\Transfer;
 use Dgame\Hydrator\JsonHydrator;
+use Dgame\Hydrator\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class JsonHydrationTest extends TestCase
@@ -8,6 +13,8 @@ class JsonHydrationTest extends TestCase
     public function testJsonHydration()
     {
         $json = file_get_contents('json/test.json');
+
+        Resolver::new()->appendNamespace('Bipro')->enableMagic();
 
         $hydrator = new JsonHydrator();
         $hydrator->hydrate(Lieferung::class, json_decode($json, true));

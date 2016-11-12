@@ -2,8 +2,6 @@
 
 namespace Dgame\Hydrator;
 
-use function Dgame\Type\typeof;
-
 /**
  * Class ArrayHydrator
  * @package Dgame\Hydrator
@@ -32,7 +30,7 @@ final class ArrayHydrator extends Hydrator
         foreach ($attributes as $attribute => $value) {
             if ($this->maybeProperty($attribute)) {
                 $this->assign($attribute, $value);
-            } else if (typeof($value)->isArray()) {
+            } else if (is_array($value)) {
                 $this->hydrate($value);
             }
         }

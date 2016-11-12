@@ -8,7 +8,7 @@ require_once '../vendor/autoload.php';
 
 class XmlHydrationTest extends TestCase
 {
-    public function testXmlHydration()
+    public function testBiproXmlHydration()
     {
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
@@ -17,7 +17,6 @@ class XmlHydrationTest extends TestCase
         $hydrator = new XmlHydrator();
 
         $hydrator->hydrate($doc);
-
         $objects = $hydrator->getHydratedObjects();
 
         $this->assertInstanceOf(Status::class, $objects[0]);
@@ -63,5 +62,24 @@ class XmlHydrationTest extends TestCase
 
         $this->assertEquals('Foo', $objects[8]->name);
         $this->assertEquals(200, $objects[8]->code);
+    }
+
+    public function testNestedXmlHydration()
+    {
+        $doc = new DOMDocument('1.0', 'utf-8');
+        $doc->load('xml/nested.xml');
+
+        $hydrator = new XmlHydrator();
+        $hydrator->hydrate($doc);
+        $objects = $hydrator->getHydratedObjects();
+
+        $this->assertEquals(7, count($objects));
+        $this->assertInstanceOf(Schema::class, $objects[0]);
+        $this->assertInstanceOf(Complex::class, $objects[0]->complex);
+        $this->assertInstanceOf(Sequence::class, $objects[0]->complex->sequence);
+        $this->assertEquals('A1', $objects[0]->complex->sequence->getElements()[0]->name);
+        $this->assertEquals('A2', $objects[0]->complex->sequence->getElements()[1]->name);
+        $this->assertEquals('B1', $objects[0]->complex->getElements()[0]->name);
+        $this->assertEquals('C1', $objects[0]->getElements()[0]->name);
     }
 }

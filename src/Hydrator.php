@@ -2,8 +2,8 @@
 
 namespace Dgame\Hydrator;
 
-use function Dgame\Wrapper\string;
 use ReflectionClass;
+use function Dgame\Wrapper\string;
 
 /**
  * Class Hydrator
@@ -14,7 +14,11 @@ abstract class Hydrator
     /**
      * @var Hydration[]
      */
-    protected $hydrations = [];
+    private $hydrations = [];
+    /**
+     * @var Hydration[]
+     */
+    private $assignment = [];
 
     /**
      *
@@ -49,7 +53,10 @@ abstract class Hydrator
             $object     = $reflection->newInstance();
 
             $this->assign($class, $object);
-            $this->hydrations[] = new Hydration($object, $reflection);
+
+            $hydration          = new Hydration($object, $reflection);
+            $this->hydrations[] = $hydration;
+            $this->assignment[] = $hydration;
 
             return $object;
         }
@@ -66,8 +73,8 @@ abstract class Hydrator
     final protected function assign(string $name, $value): bool
     {
         $name = string($name)->namespaceInfo()->getClass();
-        for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
-            $hydration = $this->hydrations[$i];
+        for ($i = count($this->assignment) - 1; $i >= 0; $i--) {
+            $hydration = $this->assignment[$i];
             if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
                 return true;
             }
@@ -84,5 +91,24 @@ abstract class Hydrator
     final protected function isValidName(string $name): bool
     {
         return !empty($name) && preg_match('#^[a-z]+#i', $name) === 1;
+    }
+
+    /**
+     * @param object $object
+     */
+    final protected function reclaim($object)
+    {
+        if (!is_object($object)) {
+            return;
+        }
+
+        for ($i = count($this->assignment) - 1; $i >= 0; $i--) {
+            if ($this->assignment[$i]->getObject() === $object) {
+                array_pop($this->assignment);
+                break;
+            }
+
+            array_pop($this->assignment);
+        }
     }
 }

@@ -5,7 +5,6 @@ namespace Dgame\Hydrator;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
-use function Dgame\Wrapper\assoc;
 use function Dgame\Wrapper\string;
 
 /**
@@ -29,13 +28,26 @@ final class XmlHydrator extends Hydrator
     {
         foreach ($nodes as $node) {
             if ($this->maybeClass($node)) {
-                $this->invokeNode($node);
-                $this->assignAttributes($node);
-                $this->hydrateNodes($node->childNodes);
+                $this->hydrateClass($node);
             } else if ($this->maybeProperty($node)) {
                 $this->assignProperty($node->nodeName, $node->nodeValue);
                 $this->assignAttributes($node);
             }
+        }
+    }
+
+    /**
+     * @param DOMNode $node
+     */
+    private function hydrateClass(DOMNode $node)
+    {
+        $object = $this->invokeNode($node);
+        if ($object !== null) {
+            $this->assignAttributes($node);
+            $this->hydrateNodes($node->childNodes);
+            $this->reclaim($object);
+        } else {
+            $this->hydrateNodes($node->childNodes);
         }
     }
 
@@ -60,11 +72,23 @@ final class XmlHydrator extends Hydrator
      */
     public function maybeClass(DOMNode $node): bool
     {
-        if ($node->nodeType === XML_ELEMENT_NODE && $node->childNodes->length > 0) {
-            foreach ($node->childNodes as $childNode) {
-                if ($childNode->nodeType === XML_ELEMENT_NODE) {
-                    return $this->isValidName($node->nodeName);
-                }
+        if ($node->nodeType === XML_ELEMENT_NODE) {
+            return $this->verifyChildNodes($node) || $node->hasAttributes();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param DOMNode $node
+     *
+     * @return bool
+     */
+    private function verifyChildNodes(DOMNode $node): bool
+    {
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode->nodeType === XML_ELEMENT_NODE) {
+                return true;
             }
         }
 
@@ -101,11 +125,11 @@ final class XmlHydrator extends Hydrator
         ];
 
         $output = [];
-        foreach ($names as $class) {
-            $output = assoc($output)->filterEmpty()->merge(Resolver::instance()->getClassNamesOf($class))->get();
+        foreach (array_filter($names) as $class) {
+            $output = array_merge($output, Resolver::instance()->getClassNamesOf($class));
         }
 
-        return $output;
+        return array_filter($output);
     }
 
     /**

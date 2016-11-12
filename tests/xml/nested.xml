@@ -1,0 +1,10 @@
+<Schema>
+    <complex>
+        <sequence>
+            <element name="A1"/>
+            <element name="A2"/>
+        </sequence>
+        <element name="B1" />
+    </complex>
+    <element name="C1" />
+</Schema>

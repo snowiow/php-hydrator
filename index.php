@@ -7,12 +7,22 @@ use Dgame\Hydrator\XmlHydrator;
 
 require_once 'vendor/autoload.php';
 
+print '<pre>';
+
+$doc = new DOMDocument('1.0', 'utf-8');
+$doc->load('tests/xml/nested.xml');
+
+$hydrator = new XmlHydrator();
+$hydrator->hydrate($doc);
+print_r($hydrator->getHydratedObjects());
+
+exit;
+
 $doc = new DOMDocument('1.0', 'utf-8');
 $doc->load('tests/xml/test.xml');
 
 Resolver::instance()->enableMagic()->useAlias('Proxy')->for('Event');
 
-print '<pre>';
 $hydrator = new XmlHydrator();
 $hydrator->hydrate($doc);
 print_r($hydrator->getHydratedObjects());

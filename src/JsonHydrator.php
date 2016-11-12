@@ -2,8 +2,6 @@
 
 namespace Dgame\Hydrator;
 
-use function Dgame\Type\typeof;
-
 /**
  * Class JsonHydrator
  * @package Dgame\Hydrator
@@ -25,7 +23,6 @@ final class JsonHydrator extends Hydrator
      */
     private function hydrateClass(string $class, array $attributes)
     {
-        //        print 'Class: ' . $class . PHP_EOL;
         $this->tryToInvoke($class);
         $this->hydrateAttributes($class, $attributes);
     }
@@ -39,7 +36,7 @@ final class JsonHydrator extends Hydrator
         foreach ($attributes as $attribute => $value) {
             if ($this->isValidName($attribute)) {
                 $this->hydrateAttribute($attribute, $value);
-            } else if (typeof($value)->isArray()) {
+            } else if (is_array($value)) {
                 $this->hydrateClass($class, $value);
             }
         }
@@ -57,7 +54,7 @@ final class JsonHydrator extends Hydrator
             return $this->hydrateClass($attribute, $value);
         }
 
-        if (typeof($value)->isArray()) {
+        if (is_array($value)) {
             return $this->hydrateAttributes($attribute, $value);
         }
 
@@ -71,7 +68,7 @@ final class JsonHydrator extends Hydrator
      */
     private function isSingleClass($data): bool
     {
-        if (typeof($data)->isArray()) {
+        if (is_array($data)) {
             foreach ($data as $key => $value) {
                 if (!$this->isValidName($key)) {
                     return false;

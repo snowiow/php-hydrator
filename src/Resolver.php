@@ -11,8 +11,9 @@ use function Dgame\Wrapper\string;
  */
 final class Resolver
 {
-    const PREFIXES = ['set', 'add', 'append'];
-
+    /**
+     * @var Resolver
+     */
     private static $instance;
 
     /**
@@ -20,17 +21,17 @@ final class Resolver
      */
     private $namespaces = [];
     /**
-     * @var \Dgame\Wrapper\ArrayWrapper
+     * @var array
      */
-    private $aliase;
+    private $aliase = [];
     /**
-     * @var \Dgame\Wrapper\ArrayWrapper
+     * @var array
      */
-    private $prefixes;
+    private $prefixes = ['set', 'add', 'append'];
     /**
-     * @var \Dgame\Wrapper\ArrayWrapper
+     * @var array
      */
-    private $methods;
+    private $methods = [];
     /**
      * @var bool
      */
@@ -41,9 +42,6 @@ final class Resolver
      */
     private function __construct()
     {
-        $this->aliase   = assoc([]);
-        $this->prefixes = assoc(self::PREFIXES);
-        $this->methods  = assoc([]);
     }
 
     /**
@@ -65,7 +63,10 @@ final class Resolver
      */
     public function appendNamespace(string $namespace): Resolver
     {
-        $this->namespaces[] = string($namespace)->rightTrim('\\')->trim()->get();
+        $namespace = string($namespace)->rightTrim('\\')->trim();
+        if ($namespace->isNotEmpty()) {
+            $this->namespaces[] = $namespace->get();
+        }
 
         return $this;
     }
@@ -95,7 +96,7 @@ final class Resolver
      */
     public function setAliase(array $aliase): Resolver
     {
-        $this->aliase = assoc($aliase);
+        $this->aliase = $aliase;
 
         return $this;
     }
@@ -107,7 +108,7 @@ final class Resolver
      */
     public function appendAliase(array $aliase): Resolver
     {
-        $this->aliase = $this->aliase->merge($aliase);
+        $this->aliase = array_merge($this->aliase, $aliase);
 
         return $this;
     }
@@ -119,7 +120,7 @@ final class Resolver
      */
     public function setPrefixes(array $prefixes): Resolver
     {
-        $this->prefixes = $this->prefixes->merge($prefixes);
+        $this->prefixes = $prefixes;
 
         return $this;
     }
@@ -131,7 +132,7 @@ final class Resolver
      */
     public function appendPrefixes(array $prefixes): Resolver
     {
-        $this->prefixes = $this->prefixes->merge($prefixes);
+        $this->prefixes = array_merge($this->prefixes, $prefixes);
 
         return $this;
     }
@@ -141,7 +142,7 @@ final class Resolver
      */
     public function getPrefixes(): array
     {
-        return $this->prefixes->get();
+        return $this->prefixes;
     }
 
     /**
@@ -161,7 +162,7 @@ final class Resolver
      */
     public function getMethods(): array
     {
-        return $this->methods->get();
+        return $this->methods;
     }
 
     /**
@@ -199,7 +200,7 @@ final class Resolver
      */
     public function getClassNamesOf(string $class): array
     {
-        $class = $this->aliase->valueOf($class)->default($class);
+        $class = assoc($this->aliase)->valueOf($class)->default($class);
         $names = [$class];
         foreach ($this->namespaces as $namespace) {
             $names[] = string('%s\\%s')->format($namespace, $class)->get();

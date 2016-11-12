@@ -30,12 +30,12 @@ final class XmlHydrator extends Hydrator
         foreach ($nodes as $node) {
             if ($this->maybeClass($node)) {
                 $this->invokeNode($node);
+                $this->assignAttributes($node);
                 $this->hydrateNodes($node->childNodes);
             } else if ($this->maybeProperty($node)) {
                 $this->assignProperty($node->nodeName, $node->nodeValue);
+                $this->assignAttributes($node);
             }
-
-            $this->assignAttributes($node);
         }
     }
 

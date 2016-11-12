@@ -16,9 +16,17 @@ abstract class Hydrator
      */
     private $hydrations = [];
     /**
-     * @var Hydration[]
+     * @var HydrationScope
      */
-    private $assignment = [];
+    private $scope;
+
+    /**
+     * Hydrator constructor.
+     */
+    public function __construct()
+    {
+        $this->scope = new HydrationScope();
+    }
 
     /**
      *
@@ -56,7 +64,7 @@ abstract class Hydrator
 
             $hydration          = new Hydration($object, $reflection);
             $this->hydrations[] = $hydration;
-            $this->assignment[] = $hydration;
+            $this->scope->push($hydration);
 
             return $object;
         }
@@ -72,11 +80,11 @@ abstract class Hydrator
      */
     final protected function assign(string $name, $value): bool
     {
-        $name = string($name)->namespaceInfo()->getClass();
-        for ($i = count($this->assignment) - 1; $i >= 0; $i--) {
-            $hydration = $this->assignment[$i];
-            if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
-                return true;
+        if (string($name)->namespaceInfo()->getClass()->isSome($name)) {
+            foreach ($this->scope->getHydrations() as $hydration) {
+                if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
+                    return true;
+                }
             }
         }
 
@@ -98,17 +106,6 @@ abstract class Hydrator
      */
     final protected function reclaim($object)
     {
-        if (!is_object($object)) {
-            return;
-        }
-
-        for ($i = count($this->assignment) - 1; $i >= 0; $i--) {
-            if ($this->assignment[$i]->getObject() === $object) {
-                array_pop($this->assignment);
-                break;
-            }
-
-            array_pop($this->assignment);
-        }
+        $this->scope->popUntil($object);
     }
 }

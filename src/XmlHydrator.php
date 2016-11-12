@@ -3,7 +3,6 @@
 namespace Dgame\Hydrator;
 
 use DOMDocument;
-use DOMNamedNodeMap;
 use DOMNode;
 use DOMNodeList;
 use function Dgame\Wrapper\assoc;
@@ -28,8 +27,7 @@ final class XmlHydrator extends Hydrator
      */
     public function hydrateNodes(DOMNodeList $nodes)
     {
-        for ($i = 0; $i < $nodes->length; $i++) {
-            $node = $nodes->item($i);
+        foreach ($nodes as $node) {
             if ($this->maybeClass($node)) {
                 $this->invokeNode($node);
                 $this->hydrateNodes($node->childNodes);
@@ -37,9 +35,7 @@ final class XmlHydrator extends Hydrator
                 $this->assignProperty($node->nodeName, $node->nodeValue);
             }
 
-            if ($node->hasAttributes()) {
-                $this->assignAttributes($node->attributes);
-            }
+            $this->assignAttributes($node);
         }
     }
 
@@ -82,7 +78,7 @@ final class XmlHydrator extends Hydrator
      */
     public function invokeNode(DOMNode $node)
     {
-        foreach ($this->resolveNode($node) as $class) {
+        foreach ($this->getClassNamesOf($node) as $class) {
             $object = $this->invoke($class);
             if ($object !== null) {
                 return $object;
@@ -97,14 +93,19 @@ final class XmlHydrator extends Hydrator
      *
      * @return array
      */
-    private function resolveNode(DOMNode $node): array
+    private function getClassNamesOf(DOMNode $node): array
     {
-        $classes = [
-            string($node->nodeName)->after(':')->get(),
-            string($node->nodeName)->replace([':' => '\\'])->get()
+        $names = [
+            string($node->nodeName)->after(':')->toUpperCaseFirst()->get(),
+            string($node->nodeName)->explode(':')->map('ucfirst')->implode('\\')->get()
         ];
 
-        return assoc($classes)->filterEmpty()->map([$this->resolver, 'resolve'])->get();
+        $output = [];
+        foreach ($names as $class) {
+            $output = assoc($output)->filterEmpty()->merge(Resolver::instance()->getClassNamesOf($class))->get();
+        }
+
+        return $output;
     }
 
     /**
@@ -121,13 +122,20 @@ final class XmlHydrator extends Hydrator
     }
 
     /**
-     * @param DOMNamedNodeMap $attributes
+     * @param DOMNode $node
+     *
+     * @return bool
      */
-    private function assignAttributes(DOMNamedNodeMap $attributes)
+    private function assignAttributes(DOMNode $node): bool
     {
-        for ($i = 0; $i < $attributes->length; $i++) {
-            $attribute = $attributes->item($i);
+        if (!$node->hasAttributes()) {
+            return false;
+        }
+
+        foreach ($node->attributes as $attribute) {
             $this->assignProperty($attribute->nodeName, $attribute->nodeValue);
         }
+
+        return true;
     }
 }

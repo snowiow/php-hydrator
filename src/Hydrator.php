@@ -11,22 +11,28 @@ use ReflectionClass;
 abstract class Hydrator
 {
     /**
-     * @var Resolver
-     */
-    protected $resolver;
-    /**
      * @var Hydration[]
      */
     protected $hydrations = [];
+    /**
+     * @var array
+     */
+    private $errors = [];
 
     /**
-     * XmlHydrator constructor.
-     *
-     * @param Resolver $resolver
+     * @return bool
      */
-    public function __construct(Resolver $resolver)
+    public function hasErrors(): bool
     {
-        $this->resolver = $resolver;
+        return !empty($this->errors);
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     /**
@@ -34,6 +40,7 @@ abstract class Hydrator
      */
     final public function reset()
     {
+        $this->errors     = [];
         $this->hydrations = [];
     }
 
@@ -57,18 +64,18 @@ abstract class Hydrator
      */
     final public function invoke(string $class)
     {
-        if (class_exists($class)) {
-            $reflection = new ReflectionClass($class);
-            $object     = $reflection->newInstance();
+        if (!empty($class)) {
+            if (class_exists($class)) {
+                $reflection = new ReflectionClass($class);
+                $object     = $reflection->newInstance();
 
-            $this->assign($class, $object);
-            $this->hydrations[] = new Hydration(
-                $object,
-                $reflection,
-                $this->resolver
-            );
+                $this->assign($class, $object);
+                $this->hydrations[] = new Hydration($object, $reflection);
 
-            return $object;
+                return $object;
+            }
+
+            $this->errors[] = sprintf('class "%s" does not exists', $class);
         }
 
         return null;
@@ -83,10 +90,13 @@ abstract class Hydrator
     final protected function assign(string $name, $value): bool
     {
         for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
-            if ($this->hydrations[$i]->assign($name, $value)) {
+            $hydration = $this->hydrations[$i];
+            if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
                 return true;
             }
         }
+
+        $this->errors[] = sprintf('attribute "%s" was not assigned', $name);
 
         return false;
     }

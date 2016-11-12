@@ -1,7 +1,6 @@
 <?php
 
 use Dgame\Hydrator\JsonHydrator;
-use Dgame\Hydrator\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class JsonHydrationTest extends TestCase
@@ -10,8 +9,7 @@ class JsonHydrationTest extends TestCase
     {
         $json = file_get_contents('json/test.json');
 
-        $resolver = new Resolver();
-        $hydrator = new JsonHydrator($resolver);
+        $hydrator = new JsonHydrator();
         $hydrator->hydrate(Lieferung::class, json_decode($json, true));
 
         $objects = $hydrator->getHydratedObjects();

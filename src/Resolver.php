@@ -13,10 +13,12 @@ final class Resolver
 {
     const PREFIXES = ['set', 'add', 'append'];
 
+    private static $instance;
+
     /**
-     * @var string
+     * @var array
      */
-    private $namespacePath;
+    private $namespaces = [];
     /**
      * @var \Dgame\Wrapper\ArrayWrapper
      */
@@ -35,24 +37,45 @@ final class Resolver
     private $magic = true;
 
     /**
-     * XmlHydrator constructor.
-     *
-     * @param string|null $namespacePath
+     * Resolver constructor.
      */
-    public function __construct(string $namespacePath = null)
+    private function __construct()
     {
-        $this->aliase        = assoc([]);
-        $this->prefixes      = assoc(self::PREFIXES);
-        $this->methods       = assoc([]);
-        $this->namespacePath = string($namespacePath)->rightTrim('\\')->trim()->get();
+        $this->aliase   = assoc([]);
+        $this->prefixes = assoc(self::PREFIXES);
+        $this->methods  = assoc([]);
     }
 
     /**
-     * @return string
+     * @return Resolver
      */
-    public function getNamespacePath(): string
+    public static function instance(): Resolver
     {
-        return $this->namespacePath;
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @param string $namespace
+     *
+     * @return Resolver
+     */
+    public function appendNamespace(string $namespace): Resolver
+    {
+        $this->namespaces[] = string($namespace)->rightTrim('\\')->trim()->get();
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNamespaces(): array
+    {
+        return $this->namespaces;
     }
 
     /**
@@ -172,15 +195,16 @@ final class Resolver
     /**
      * @param string $class
      *
-     * @return string
+     * @return array
      */
-    public function resolve(string $class): string
+    public function getClassNamesOf(string $class): array
     {
         $class = $this->aliase->valueOf($class)->default($class);
-        if (empty($this->namespacePath)) {
-            return $class;
+        $names = [$class];
+        foreach ($this->namespaces as $namespace) {
+            $names[] = string('%s\\%s')->format($namespace, $class)->get();
         }
 
-        return string('%s\\%s')->format($this->namespacePath, $class)->get();
+        return $names;
     }
 }

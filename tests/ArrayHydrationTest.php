@@ -1,7 +1,6 @@
 <?php
 
 use Dgame\Hydrator\ArrayHydrator;
-use Dgame\Hydrator\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class ArrayHydrationTest extends TestCase
@@ -32,8 +31,7 @@ class ArrayHydrationTest extends TestCase
             ]
         ];
 
-        $resolver = new Resolver();
-        $hydrator = new ArrayHydrator($resolver);
+        $hydrator = new ArrayHydrator();
 
         $hydrator->hydrate($data);
         $objects = $hydrator->getHydratedObjects();

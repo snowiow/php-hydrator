@@ -4,6 +4,7 @@ namespace Dgame\Hydrator;
 
 use Exception;
 use ReflectionClass;
+use function Dgame\Wrapper\assoc;
 use function Dgame\Wrapper\string;
 
 /**
@@ -21,20 +22,19 @@ final class Hydration
      */
     private $object;
     /**
-     * @var Resolver
+     * @var array
      */
-    private $resolver;
+    private $assigned = [];
 
     /**
      * Hydration constructor.
      *
      * @param                 $object
      * @param ReflectionClass $reflection
-     * @param Resolver        $resolver
      *
      * @throws Exception
      */
-    public function __construct($object, ReflectionClass $reflection, Resolver $resolver)
+    public function __construct($object, ReflectionClass $reflection)
     {
         if (!$reflection->isInstance($object)) {
             throw new Exception('Invalid object');
@@ -42,7 +42,6 @@ final class Hydration
 
         $this->reflection = $reflection;
         $this->object     = $object;
-        $this->resolver   = $resolver;
     }
 
     /**
@@ -61,7 +60,32 @@ final class Hydration
      */
     public function assign(string $name, $value): bool
     {
-        return $this->assignByProperty($name, $value) || $this->assignByMethod($name, $value);
+        $result = $this->assignByProperty($name, $value) || $this->assignByMethod($name, $value);
+
+        $this->assigned[$name] = $result;
+
+        return $result;
+    }
+
+    /**
+     * @param string $name
+     * @param        $value
+     *
+     * @return bool
+     */
+    public function shouldAssign(string $name, $value): bool
+    {
+        return !$this->isAssigned($name) || is_numeric($value) || !empty($value);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function isAssigned(string $name): bool
+    {
+        return assoc($this->assigned)->valueOf($name)->default(false);
     }
 
     /**
@@ -72,12 +96,19 @@ final class Hydration
      */
     private function assignByProperty(string $name, $value): bool
     {
-        if ($this->reflection->hasProperty($name)) {
-            $property = $this->reflection->getProperty($name);
-            if ($property->isPublic()) {
-                $property->setValue($this->object, $value);
+        $names = [
+            string($name)->toLowerCaseFirst()->get(),
+            string($name)->toUpperCaseFirst()->get()
+        ];
 
-                return true;
+        foreach ($names as $name) {
+            if ($this->reflection->hasProperty($name)) {
+                $property = $this->reflection->getProperty($name);
+                if ($property->isPublic()) {
+                    $property->setValue($this->object, $value);
+
+                    return true;
+                }
             }
         }
 
@@ -98,7 +129,7 @@ final class Hydration
             }
         }
 
-        if ($this->resolver->isMagicAllowed()) {
+        if (Resolver::instance()->isMagicAllowed()) {
             return $this->tryToInvoke('__set', $name, $value);
         }
 
@@ -112,14 +143,14 @@ final class Hydration
      */
     private function gatherMethods(string $name): array
     {
-        $name = string($name)->upperCaseFirst()->get();
+        $name = string($name)->toUpperCaseFirst()->get();
 
         $methods = [];
-        foreach ($this->resolver->getPrefixes() as $prefix) {
+        foreach (Resolver::instance()->getPrefixes() as $prefix) {
             $methods[] = $prefix . $name;
         }
 
-        return array_merge($methods, $this->resolver->getMethods());
+        return array_merge($methods, Resolver::instance()->getMethods());
     }
 
     /**

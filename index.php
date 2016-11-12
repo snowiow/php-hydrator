@@ -10,12 +10,10 @@ require_once 'vendor/autoload.php';
 $doc = new DOMDocument('1.0', 'utf-8');
 $doc->load('tests/xml/test.xml');
 
-$resolver = new Resolver();
-$resolver->enableMagic()
-         ->useAlias('Proxy')->for('Event');
+Resolver::instance()->enableMagic()->useAlias('Proxy')->for('Event');
 
 print '<pre>';
-$hydrator = new XmlHydrator($resolver);
+$hydrator = new XmlHydrator();
 $hydrator->hydrate($doc);
 print_r($hydrator->getHydratedObjects());
 

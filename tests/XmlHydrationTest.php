@@ -13,12 +13,11 @@ class XmlHydrationTest extends TestCase
         $doc = new DOMDocument('1.0', 'utf-8');
         $doc->load('xml/test.xml');
 
-        $resolver = new Resolver();
-        $resolver->enableMagic()
-                 ->useAlias('Proxy')->for('Event');
-        $hydrator = new XmlHydrator($resolver);
+        Resolver::instance()->enableMagic()->useAlias('Proxy')->for('Event');
+        $hydrator = new XmlHydrator();
 
         $hydrator->hydrate($doc);
+
         $objects = $hydrator->getHydratedObjects();
 
         $this->assertInstanceOf(Status::class, $objects[0]);

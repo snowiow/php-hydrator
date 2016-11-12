@@ -2,6 +2,7 @@
 
 namespace Dgame\Hydrator;
 
+use function Dgame\Wrapper\string;
 use ReflectionClass;
 
 /**
@@ -14,33 +15,12 @@ abstract class Hydrator
      * @var Hydration[]
      */
     protected $hydrations = [];
-    /**
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @return bool
-     */
-    public function hasErrors(): bool
-    {
-        return !empty($this->errors);
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
 
     /**
      *
      */
     final public function reset()
     {
-        $this->errors     = [];
         $this->hydrations = [];
     }
 
@@ -62,20 +42,16 @@ abstract class Hydrator
      *
      * @return null|object
      */
-    final public function invoke(string $class)
+    final public function tryToInvoke(string $class)
     {
-        if (!empty($class)) {
-            if (class_exists($class)) {
-                $reflection = new ReflectionClass($class);
-                $object     = $reflection->newInstance();
+        if (class_exists($class)) {
+            $reflection = new ReflectionClass($class);
+            $object     = $reflection->newInstance();
 
-                $this->assign($class, $object);
-                $this->hydrations[] = new Hydration($object, $reflection);
+            $this->assign($class, $object);
+            $this->hydrations[] = new Hydration($object, $reflection);
 
-                return $object;
-            }
-
-            $this->errors[] = sprintf('class "%s" does not exists', $class);
+            return $object;
         }
 
         return null;
@@ -89,14 +65,13 @@ abstract class Hydrator
      */
     final protected function assign(string $name, $value): bool
     {
+        $name = string($name)->namespaceInfo()->getClass();
         for ($i = count($this->hydrations) - 1; $i >= 0; $i--) {
             $hydration = $this->hydrations[$i];
             if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
                 return true;
             }
         }
-
-        $this->errors[] = sprintf('attribute "%s" was not assigned', $name);
 
         return false;
     }

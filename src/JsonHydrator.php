@@ -26,7 +26,7 @@ final class JsonHydrator extends Hydrator
     private function hydrateClass(string $class, array $attributes)
     {
         //        print 'Class: ' . $class . PHP_EOL;
-        $this->invoke($class);
+        $this->tryToInvoke($class);
         $this->hydrateAttributes($class, $attributes);
     }
 

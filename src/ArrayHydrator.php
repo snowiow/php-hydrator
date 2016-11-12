@@ -17,7 +17,7 @@ final class ArrayHydrator extends Hydrator
     {
         foreach ($data as $class => $attributes) {
             if ($this->maybeClass($class)) {
-                $this->invoke($class);
+                $this->tryToInvoke($class);
             }
 
             $this->hydrateAttributes($attributes);

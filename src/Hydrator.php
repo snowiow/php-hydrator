@@ -103,11 +103,10 @@ abstract class Hydrator
      */
     final protected function assign(string $name, $value): bool
     {
-        if (string($name)->namespaceInfo()->getClass()->isSome($name)) {
-            foreach ($this->scope->getHydrations() as $hydration) {
-                if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
-                    return true;
-                }
+        $name = string($name)->namespaceInfo()->getClass();
+        foreach ($this->scope->getHydrations() as $hydration) {
+            if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
+                return true;
             }
         }
 

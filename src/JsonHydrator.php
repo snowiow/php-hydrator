@@ -46,21 +46,17 @@ final class JsonHydrator extends Hydrator
 
     /**
      * @param string $attribute
-     * @param        $value
-     *
-     * @return bool|void
+     * @param mixed  $value
      */
     private function hydrateAttribute(string $attribute, $value)
     {
         if ($this->isSingleClass($value)) {
-            return $this->hydrateClass($attribute, $value);
+            $this->hydrateClass($attribute, $value);
+        } else if (is_array($value)) {
+            $this->hydrateAttributes($attribute, $value);
+        } else {
+            $this->assign($attribute, $value);
         }
-
-        if (is_array($value)) {
-            return $this->hydrateAttributes($attribute, $value);
-        }
-
-        return $this->assign($attribute, $value);
     }
 
     /**

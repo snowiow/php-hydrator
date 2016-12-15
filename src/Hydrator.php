@@ -3,7 +3,7 @@
 namespace Dgame\Hydrator;
 
 use ReflectionClass;
-use function Dgame\Wrapper\namespaceOf;
+use function Dgame\Wrapper\object;
 use function Dgame\Wrapper\string;
 
 /**
@@ -104,7 +104,7 @@ abstract class Hydrator
      */
     final protected function assign(string $name, $value): bool
     {
-        $name = namespaceOf($name)->getClass();
+        $name = object($name)->getNamespaceInfo()->getClass();
         foreach ($this->scope->getHydrations() as $hydration) {
             if ($hydration->shouldAssign($name, $value) && $hydration->assign($name, $value)) {
                 return true;

@@ -14,14 +14,12 @@ use Nested\Schema;
 use Nested\Sequence;
 use PHPUnit\Framework\TestCase;
 
-require_once '../vendor/autoload.php';
-
 class XmlHydrationTest extends TestCase
 {
     public function testBiproXmlHydration()
     {
         $doc = new DOMDocument('1.0', 'utf-8');
-        $doc->load('xml/test.xml');
+        $doc->load(dirname(__FILE__) . '/xml/test.xml');
 
         Resolver::new()->appendNamespace('Bipro')->enableMagic()->useAlias('Proxy')->for('Event');
 
@@ -78,7 +76,7 @@ class XmlHydrationTest extends TestCase
     public function testNestedXmlHydration()
     {
         $doc = new DOMDocument('1.0', 'utf-8');
-        $doc->load('xml/nested.xml');
+        $doc->load(dirname(__FILE__) . '/xml/nested.xml');
 
         Resolver::new()->appendNamespace('Nested');
 

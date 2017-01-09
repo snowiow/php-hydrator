@@ -12,7 +12,7 @@ class JsonHydrationTest extends TestCase
 {
     public function testJsonHydration()
     {
-        $json = file_get_contents('json/test.json');
+        $json = file_get_contents(dirname(__FILE__) . '/json/test.json');
 
         Resolver::new()->appendNamespace('Bipro')->enableMagic();
 

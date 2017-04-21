@@ -11,7 +11,7 @@ use function Dgame\Wrapper\string;
  * Class XmlHydrator
  * @package Dgame\Hydrator
  */
-final class XmlHydrator extends Hydrator
+class XmlHydrator extends Hydrator
 {
     /**
      * @param DOMDocument $document

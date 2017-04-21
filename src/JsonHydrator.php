@@ -6,7 +6,7 @@ namespace Dgame\Hydrator;
  * Class JsonHydrator
  * @package Dgame\Hydrator
  */
-final class JsonHydrator extends Hydrator
+class JsonHydrator extends Hydrator
 {
     /**
      * @param string $class

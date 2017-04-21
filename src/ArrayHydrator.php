@@ -6,7 +6,7 @@ namespace Dgame\Hydrator;
  * Class ArrayHydrator
  * @package Dgame\Hydrator
  */
-final class ArrayHydrator extends Hydrator
+class ArrayHydrator extends Hydrator
 {
     /**
      * @param array $data

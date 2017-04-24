@@ -39,7 +39,7 @@ class XmlHydrator extends Hydrator
     /**
      * @param DOMNode $node
      */
-    private function hydrateClass(DOMNode $node)
+    protected function hydrateClass(DOMNode $node)
     {
         $object = $this->invokeNode($node);
         if ($object !== null) {
@@ -84,7 +84,7 @@ class XmlHydrator extends Hydrator
      *
      * @return bool
      */
-    private function verifyChildNodes(DOMNode $node): bool
+    protected function verifyChildNodes(DOMNode $node): bool
     {
         foreach ($node->childNodes as $childNode) {
             if ($childNode->nodeType === XML_ELEMENT_NODE) {
@@ -112,7 +112,7 @@ class XmlHydrator extends Hydrator
      *
      * @return array
      */
-    private function getClassNamesOf(DOMNode $node): array
+    protected function getClassNamesOf(DOMNode $node): array
     {
         $names = [
             string($node->nodeName)->after(':')->toUpperCaseFirst()->get(),
@@ -133,7 +133,7 @@ class XmlHydrator extends Hydrator
      *
      * @return bool
      */
-    private function assignProperty(string $name, $value): bool
+    protected function assignProperty(string $name, $value): bool
     {
         $name = string($name)->after(':')->default($name)->get();
 
@@ -145,7 +145,7 @@ class XmlHydrator extends Hydrator
      *
      * @return bool
      */
-    private function assignAttributes(DOMNode $node): bool
+    protected function assignAttributes(DOMNode $node): bool
     {
         if (!$node->hasAttributes()) {
             return false;

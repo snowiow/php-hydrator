@@ -25,7 +25,7 @@ class ArrayHydrator extends Hydrator
     /**
      * @param array $attributes
      */
-    private function hydrateAttributes(array $attributes)
+    protected function hydrateAttributes(array $attributes)
     {
         foreach ($attributes as $attribute => $value) {
             if ($this->maybeProperty($attribute)) {
@@ -41,7 +41,7 @@ class ArrayHydrator extends Hydrator
      *
      * @return bool
      */
-    private function maybeClass(string $class)
+    protected function maybeClass(string $class)
     {
         return $this->isValidName($class);
     }
@@ -51,7 +51,7 @@ class ArrayHydrator extends Hydrator
      *
      * @return bool
      */
-    private function maybeProperty(string $property)
+    protected function maybeProperty(string $property)
     {
         return $this->isValidName($property);
     }

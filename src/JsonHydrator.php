@@ -21,7 +21,7 @@ class JsonHydrator extends Hydrator
      * @param string $class
      * @param array  $attributes
      */
-    private function hydrateClass(string $class, array $attributes)
+    protected function hydrateClass(string $class, array $attributes)
     {
         $object = $this->tryToInvokeOne(Resolver::instance()->getClassNamesOf($class));
         if ($object !== null) {
@@ -33,7 +33,7 @@ class JsonHydrator extends Hydrator
      * @param string $class
      * @param array  $attributes
      */
-    private function hydrateAttributes(string $class, array $attributes)
+    protected function hydrateAttributes(string $class, array $attributes)
     {
         foreach ($attributes as $attribute => $value) {
             if ($this->isValidName($attribute)) {
@@ -48,7 +48,7 @@ class JsonHydrator extends Hydrator
      * @param string $attribute
      * @param mixed  $value
      */
-    private function hydrateAttribute(string $attribute, $value)
+    protected function hydrateAttribute(string $attribute, $value)
     {
         if ($this->isSingleClass($value)) {
             $this->hydrateClass($attribute, $value);
@@ -64,7 +64,7 @@ class JsonHydrator extends Hydrator
      *
      * @return bool
      */
-    private function isSingleClass($data): bool
+    protected function isSingleClass($data): bool
     {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
